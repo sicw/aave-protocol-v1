@@ -22,8 +22,9 @@ describe("Aave v1", function () {
         const priceOracleFactory = await ethers.getContractFactory("PriceOracle");
         const priceOracle = await priceOracleFactory.deploy();
 
-        const ethereumAddressFactory = await ethers.getContractFactory("EthereumAddress");
-        const ethereumAddress = await ethereumAddressFactory.deploy();
+        // 无用
+        // const ethereumAddressFactory = await ethers.getContractFactory("EthereumAddress");
+        // const ethereumAddress = await ethereumAddressFactory.deploy();
 
         const lendingPoolDataProviderFactory = await ethers.getContractFactory("LendingPoolDataProvider");
         const lendingPoolDataProvider = await lendingPoolDataProviderFactory.deploy();
@@ -34,13 +35,21 @@ describe("Aave v1", function () {
         const lendingPoolConfiguratorFactory = await ethers.getContractFactory("LendingPoolConfigurator");
         const lendingPoolConfigurator = await lendingPoolConfiguratorFactory.deploy();
 
-        const lendingPoolManagerFactory = await ethers.getContractFactory("LendingPoolManager");
-        const lendingPoolManager = await lendingPoolManagerFactory.deploy();
+        // 手动设置
+        // const lendingPoolManagerFactory = await ethers.getContractFactory("LendingPoolManager");
+        // const lendingPoolManager = await lendingPoolManagerFactory.deploy();
 
         const lendingPoolParametersProviderFactory = await ethers.getContractFactory("LendingPoolParametersProvider");
         const lendingPoolParametersProvider = await lendingPoolParametersProviderFactory.deploy();
 
-        const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore");
+        const coreLibraryFactory = await ethers.getContractFactory("CoreLibrary");
+        const coreLibrary = await coreLibraryFactory.deploy();
+
+        const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore", {
+            libraries: {
+                CoreLibrary: await coreLibrary.getAddress(),
+            },
+        });
         const lendingPoolCore = await lendingPoolCoreFactory.deploy();
 
         const lendingPoolFactory = await ethers.getContractFactory("LendingPool");
