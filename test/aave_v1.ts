@@ -5,6 +5,7 @@ import {
 import {anyValue} from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import {expect} from "chai";
 import {ethers} from "hardhat";
+import {LendingPoolConfigurator} from "../typechain-types/contracts/lendingpool/LendingPoolConfigurator";
 
 describe("Aave v1", function () {
     async function deployTestEnvFixture() {
@@ -55,13 +56,39 @@ describe("Aave v1", function () {
         const lendingPoolFactory = await ethers.getContractFactory("LendingPool");
         const lendingPool = await lendingPoolFactory.deploy();
 
-        return {lendingPool};
+        const lendingPoolAddressesProviderFactory = await ethers.getContractFactory("LendingPoolAddressesProvider");
+        const lendingPoolAddressesProvider = await lendingPoolAddressesProviderFactory.deploy();
+
+        /* set address provider and proxy init data */
+        await lendingPoolAddressesProvider.setTokenDistributor(await tokenDistributor.getAddress());
+        await lendingPoolAddressesProvider.setFeeProviderImpl(await feeProvider.getAddress());
+        await lendingPoolAddressesProvider.setLendingRateOracle(await lendingRateOracle.getAddress());
+        await lendingPoolAddressesProvider.setPriceOracle(await priceOracle.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(await lendingPoolDataProvider.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolLiquidationManager(await lendingPoolLiquidationManager.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolManager(await owner.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(await lendingPoolConfigurator.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolParametersProviderImpl(await lendingPoolParametersProvider.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCore.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolImpl(await lendingPool.getAddress());
+
+        return {lendingPool, lendingPoolCore, lendingPoolAddressesProvider, lendingPoolConfigurator};
     }
 
     describe("Lending pool", function () {
-        it("deposit", async function () {
-            const {} = await loadFixture(deployTestEnvFixture);
-            console.log('123123')
+        it("initReserve", async function () {
+            const {lendingPool, lendingPoolCore, lendingPoolAddressesProvider, lendingPoolConfigurator} = await loadFixture(deployTestEnvFixture);
+
+            const mockMANAFactory = await ethers.getContractFactory("MockMANA");
+            const mockMANA = await mockMANAFactory.deploy();
+
+            const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+
+            // 不能直接用部署的地址, 应该用代理
+            // attach用来关联新地址
+            const lendingPoolConfiguratorAddress = await lendingPoolAddressesProvider.getLendingPoolConfigurator();
+            lendingPoolConfigurator.attach(lendingPoolConfiguratorAddress).initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
         });
     });
 });
