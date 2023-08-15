@@ -72,18 +72,28 @@ describe("Aave v1", function () {
         await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCore.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolImpl(await lendingPool.getAddress());
 
+        const tokenDistributorProxy = tokenDistributor.attach(await lendingPoolAddressesProvider.getTokenDistributor());
+        const feeProviderProxy = feeProvider.attach(await lendingPoolAddressesProvider.getFeeProvider());
+        const lendingRateOracleProxy = lendingRateOracle.attach(await lendingPoolAddressesProvider.getLendingRateOracle());
+        const priceOracleProxy = priceOracle.attach(await lendingPoolAddressesProvider.getPriceOracle());
+        const lendingPoolDataProviderProxy = lendingPoolDataProvider.attach(await lendingPoolAddressesProvider.getLendingPoolDataProvider());
+        const lendingPoolLiquidationManagerProxy = lendingPoolLiquidationManager.attach(await lendingPoolAddressesProvider.getLendingPoolLiquidationManager());
+        const lendingPoolConfiguratorProxy = lendingPoolConfigurator.attach(await lendingPoolAddressesProvider.getLendingPoolConfigurator());
+        const lendingPoolParametersProviderProxy = lendingPoolParametersProvider.attach(await lendingPoolAddressesProvider.getLendingPoolParametersProvider());
+        const lendingPoolCoreProxy = lendingPoolCore.attach(await lendingPoolAddressesProvider.getLendingPoolCore());
+        const lendingPoolProxy = lendingPool.attach(await lendingPoolAddressesProvider.getLendingPool());
+
         return {
-            tokenDistributor,
-            feeProvider,
-            lendingRateOracle,
-            priceOracle,
-            lendingPoolDataProvider,
-            lendingPoolLiquidationManager,
-            lendingPoolParametersProvider,
-            coreLibrary,
-            lendingPool,
-            lendingPoolCore,
-            lendingPoolConfigurator,
+            tokenDistributorProxy,
+            feeProviderProxy,
+            lendingRateOracleProxy,
+            priceOracleProxy,
+            lendingPoolDataProviderProxy,
+            lendingPoolLiquidationManagerProxy,
+            lendingPoolConfiguratorProxy,
+            lendingPoolParametersProviderProxy,
+            lendingPoolCoreProxy,
+            lendingPoolProxy,
             lendingPoolAddressesProvider
         };
     }
@@ -91,17 +101,16 @@ describe("Aave v1", function () {
     describe("Lending pool", function () {
         it("initReserve", async function () {
             const {
-                tokenDistributor,
-                feeProvider,
-                lendingRateOracle,
-                priceOracle,
-                lendingPoolDataProvider,
-                lendingPoolLiquidationManager,
-                lendingPoolParametersProvider,
-                coreLibrary,
-                lendingPool,
-                lendingPoolCore,
-                lendingPoolConfigurator,
+                tokenDistributorProxy,
+                feeProviderProxy,
+                lendingRateOracleProxy,
+                priceOracleProxy,
+                lendingPoolDataProviderProxy,
+                lendingPoolLiquidationManagerProxy,
+                lendingPoolConfiguratorProxy,
+                lendingPoolParametersProviderProxy,
+                lendingPoolCoreProxy,
+                lendingPoolProxy,
                 lendingPoolAddressesProvider
             } = await loadFixture(deployTestEnvFixture);
 
@@ -113,8 +122,7 @@ describe("Aave v1", function () {
 
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
-            const lendingPoolConfiguratorAddress = await lendingPoolAddressesProvider.getLendingPoolConfigurator();
-            lendingPoolConfigurator.attach(lendingPoolConfiguratorAddress).initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+            lendingPoolCoreProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
         });
     });
 });
