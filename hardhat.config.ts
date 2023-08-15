@@ -1,8 +1,13 @@
-import { HardhatUserConfig } from "hardhat/config";
+import {HardhatUserConfig} from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
 const config: HardhatUserConfig = {
-  solidity: "0.5.5",
+    solidity: "0.5.5",
+    networks: {
+        hardhat: {
+            allowUnlimitedContractSize: true
+        }
+    }
 };
 
 export default config;
