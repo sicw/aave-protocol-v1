@@ -72,12 +72,38 @@ describe("Aave v1", function () {
         await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCore.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolImpl(await lendingPool.getAddress());
 
-        return {lendingPool, lendingPoolCore, lendingPoolAddressesProvider, lendingPoolConfigurator};
+        return {
+            tokenDistributor,
+            feeProvider,
+            lendingRateOracle,
+            priceOracle,
+            lendingPoolDataProvider,
+            lendingPoolLiquidationManager,
+            lendingPoolParametersProvider,
+            coreLibrary,
+            lendingPool,
+            lendingPoolCore,
+            lendingPoolConfigurator,
+            lendingPoolAddressesProvider
+        };
     }
 
     describe("Lending pool", function () {
         it("initReserve", async function () {
-            const {lendingPool, lendingPoolCore, lendingPoolAddressesProvider, lendingPoolConfigurator} = await loadFixture(deployTestEnvFixture);
+            const {
+                tokenDistributor,
+                feeProvider,
+                lendingRateOracle,
+                priceOracle,
+                lendingPoolDataProvider,
+                lendingPoolLiquidationManager,
+                lendingPoolParametersProvider,
+                coreLibrary,
+                lendingPool,
+                lendingPoolCore,
+                lendingPoolConfigurator,
+                lendingPoolAddressesProvider
+            } = await loadFixture(deployTestEnvFixture);
 
             const mockMANAFactory = await ethers.getContractFactory("MockMANA");
             const mockMANA = await mockMANAFactory.deploy();
