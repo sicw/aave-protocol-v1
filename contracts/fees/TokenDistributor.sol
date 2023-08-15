@@ -1,6 +1,18 @@
 pragma solidity ^0.5.0;
 
-
+import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
+import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../interfaces/IKyberNetworkProxyInterface.sol";
+import "../libraries/CoreLibrary.sol";
+import "../configuration/LendingPoolAddressesProvider.sol";
+import "../interfaces/ILendingRateOracle.sol";
+import "../interfaces/IReserveInterestRateStrategy.sol";
+import "../libraries/WadRayMath.sol";
+import "../tokenization/AToken.sol";
+import "../libraries/EthAddressLib.sol";
 
 /// @title TokenDistributor
 /// @author Aave
@@ -54,7 +66,7 @@ contract TokenDistributor is ReentrancyGuard, VersionedInitializable {
     address public recipientBurn;
 
     /// @notice DEPRECATED
-    IExchangeAdapter public exchangeAdapter;
+    // IExchangeAdapter public exchangeAdapter;
 
     /// @notice Called by the proxy when setting this contract as implementation
     function initialize(
@@ -62,8 +74,8 @@ contract TokenDistributor is ReentrancyGuard, VersionedInitializable {
         uint256[] memory _percentages
     ) public initializer {
         internalSetTokenDistribution(_receivers, _percentages);
-        emit DistributionUpdated(_receivers, _percentages);    
-        
+        emit DistributionUpdated(_receivers, _percentages);
+
     }
 
     /// @notice In order to receive ETH transfers
@@ -143,7 +155,7 @@ contract TokenDistributor is ReentrancyGuard, VersionedInitializable {
                 require(_success, "Reverted ETH transfer");
             }
             emit Distributed(_distribution.receivers[j], _distribution.percentages[j], _amount);
-            
+
         }
     }
 
