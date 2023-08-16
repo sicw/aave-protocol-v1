@@ -64,12 +64,12 @@ describe("Aave v1", function () {
         await lendingPoolAddressesProvider.setFeeProviderImpl(await feeProvider.getAddress());
         await lendingPoolAddressesProvider.setLendingRateOracle(await lendingRateOracle.getAddress());
         await lendingPoolAddressesProvider.setPriceOracle(await priceOracle.getAddress());
-        await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(await lendingPoolDataProvider.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolLiquidationManager(await lendingPoolLiquidationManager.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolManager(await owner.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolConfiguratorImpl(await lendingPoolConfigurator.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolParametersProviderImpl(await lendingPoolParametersProvider.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCore.getAddress());
+        await lendingPoolAddressesProvider.setLendingPoolDataProviderImpl(await lendingPoolDataProvider.getAddress());
         await lendingPoolAddressesProvider.setLendingPoolImpl(await lendingPool.getAddress());
 
         const tokenDistributorProxy = tokenDistributor.attach(await lendingPoolAddressesProvider.getTokenDistributor());
