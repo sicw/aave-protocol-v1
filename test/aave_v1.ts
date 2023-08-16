@@ -146,6 +146,9 @@ describe("Aave v1", function () {
             const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
             const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
 
+            // todo 暂时重新设置LendPool地址, 不清楚线上怎么搞的
+            await lendingPoolCoreProxy.refreshConfigInternal();
+
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
             await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
