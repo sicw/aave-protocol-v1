@@ -1,10 +1,10 @@
 pragma solidity ^0.5.0;
 
 import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
-import "openzeppelin-solidity/contracts/utils/ReentrancyGuard.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "../custom/ReentrancyGuard.sol";
 import "../interfaces/IKyberNetworkProxyInterface.sol";
 import "../libraries/CoreLibrary.sol";
 import "../configuration/LendingPoolAddressesProvider.sol";

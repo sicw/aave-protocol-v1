@@ -152,8 +152,7 @@ describe("Aave v1", function () {
 
             await mockMANA.mint(20000);
             await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
-            console.log(await lendingPoolProxy._notEntered());
-            // await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
+            await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
         });
     });
 });
