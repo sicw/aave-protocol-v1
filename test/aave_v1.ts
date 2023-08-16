@@ -99,7 +99,7 @@ describe("Aave v1", function () {
     }
 
     describe("Lending pool", function () {
-        it("initReserve", async function () {
+        it.skip("initReserve", async function () {
             const {
                 tokenDistributorProxy,
                 feeProviderProxy,
@@ -123,6 +123,37 @@ describe("Aave v1", function () {
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
             await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+        });
+
+        it("deposit", async function () {
+            const {
+                tokenDistributorProxy,
+                feeProviderProxy,
+                lendingRateOracleProxy,
+                priceOracleProxy,
+                lendingPoolDataProviderProxy,
+                lendingPoolLiquidationManagerProxy,
+                lendingPoolConfiguratorProxy,
+                lendingPoolParametersProviderProxy,
+                lendingPoolCoreProxy,
+                lendingPoolProxy,
+                lendingPoolAddressesProvider
+            } = await loadFixture(deployTestEnvFixture);
+
+            const mockMANAFactory = await ethers.getContractFactory("MockMANA");
+            const mockMANA = await mockMANAFactory.deploy();
+
+            const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+
+            // 不能直接用部署的地址, 应该用代理
+            // attach用来关联新地址
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+
+            await mockMANA.mint(20000);
+            await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            console.log(await lendingPoolProxy._notEntered());
+            // await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
         });
     });
 });
