@@ -1756,7 +1756,7 @@ contract LendingPoolCore is VersionedInitializable {
     /**
     * @dev updates the internal configuration of the core
     **/
-    function refreshConfigInternal() public {
+    function refreshConfigInternal() internal {
         lendingPoolAddress = addressesProvider.getLendingPool();
     }
 
