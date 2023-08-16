@@ -122,7 +122,7 @@ describe("Aave v1", function () {
 
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
-            lendingPoolCoreProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
         });
     });
 });
