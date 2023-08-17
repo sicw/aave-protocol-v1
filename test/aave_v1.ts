@@ -6,8 +6,10 @@ import {anyValue} from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import {expect} from "chai";
 import {ethers} from "hardhat";
 import {LendingPoolConfigurator} from "../typechain-types/contracts/lendingpool/LendingPoolConfigurator";
+import aTokenAbi from "../artifacts/contracts/tokenization/AToken.sol/AToken.json";
 
 describe("Aave v1", function () {
+
     async function deployTestEnvFixture() {
         const [owner, otherAccount] = await ethers.getSigners();
 
@@ -97,11 +99,14 @@ describe("Aave v1", function () {
             lendingPoolParametersProviderProxy,
             lendingPoolCoreProxy,
             lendingPoolProxy,
-            lendingPoolAddressesProvider
+            lendingPoolAddressesProvider,
+            owner,
+            otherAccount
         };
     }
 
     describe("Lending pool", function () {
+
         it.skip("initReserve", async function () {
             const {
                 tokenDistributorProxy,
@@ -128,7 +133,7 @@ describe("Aave v1", function () {
             await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
         });
 
-        it("deposit", async function () {
+        it.skip("deposit", async function () {
             const {
                 tokenDistributorProxy,
                 feeProviderProxy,
@@ -140,7 +145,8 @@ describe("Aave v1", function () {
                 lendingPoolParametersProviderProxy,
                 lendingPoolCoreProxy,
                 lendingPoolProxy,
-                lendingPoolAddressesProvider
+                lendingPoolAddressesProvider,
+                owner
             } = await loadFixture(deployTestEnvFixture);
 
             const mockMANAFactory = await ethers.getContractFactory("MockMANA");
@@ -156,6 +162,90 @@ describe("Aave v1", function () {
             await mockMANA.mint(20000);
             await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
             await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
+
+            const aTokenAddress = await lendingPoolCoreProxy.getReserveATokenAddress(await mockMANA.getAddress());
+            const aTokenContract = await ethers.getContractAt(aTokenAbi.abi, aTokenAddress, owner);
+            const balanceOfOwner = await aTokenContract.balanceOf(await owner.getAddress());
+
+            expect(balanceOfOwner).to.equal(10000n);
+        });
+
+        it.skip("redeemUnderlying", async function () {
+            const {
+                tokenDistributorProxy,
+                feeProviderProxy,
+                lendingRateOracleProxy,
+                priceOracleProxy,
+                lendingPoolDataProviderProxy,
+                lendingPoolLiquidationManagerProxy,
+                lendingPoolConfiguratorProxy,
+                lendingPoolParametersProviderProxy,
+                lendingPoolCoreProxy,
+                lendingPoolProxy,
+                lendingPoolAddressesProvider,
+                owner
+            } = await loadFixture(deployTestEnvFixture);
+
+            const mockMANAFactory = await ethers.getContractFactory("MockMANA");
+            const mockMANA = await mockMANAFactory.deploy();
+
+            const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+
+            // 不能直接用部署的地址, 应该用代理
+            // attach用来关联新地址
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+
+            await mockMANA.mint(20000);
+            await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
+
+            const aTokenAddress = await lendingPoolCoreProxy.getReserveATokenAddress(await mockMANA.getAddress());
+            const aTokenContract = await ethers.getContractAt(aTokenAbi.abi, aTokenAddress, owner);
+
+            // 只能aToken调用赎回操作
+            await aTokenContract.redeem(10000);
+
+            const balanceOfOwner = await aTokenContract.balanceOf(await owner.getAddress());
+            expect(balanceOfOwner).to.equal(0n);
+        });
+
+        it("borrow", async function () {
+            const {
+                tokenDistributorProxy,
+                feeProviderProxy,
+                lendingRateOracleProxy,
+                priceOracleProxy,
+                lendingPoolDataProviderProxy,
+                lendingPoolLiquidationManagerProxy,
+                lendingPoolConfiguratorProxy,
+                lendingPoolParametersProviderProxy,
+                lendingPoolCoreProxy,
+                lendingPoolProxy,
+                lendingPoolAddressesProvider,
+                owner,
+                otherAccount
+            } = await loadFixture(deployTestEnvFixture);
+
+            const mockMANAFactory = await ethers.getContractFactory("MockMANA");
+            const mockMANA = await mockMANAFactory.deploy();
+
+            const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+
+            // 不能直接用部署的地址, 应该用代理
+            // attach用来关联新地址
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+
+            await mockMANA.mint(20000);
+            await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
+
+            expect(await ethers.provider.getBalance(await otherAccount.getAddress())).to.equal(10000000000000000000000n);
+
+            await lendingPoolProxy.attach(await otherAccount.getAddress()).borrow(await mockMANA.getAddress(), 100, 0, 0);
+
+            expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(100n);
         });
     });
 });
