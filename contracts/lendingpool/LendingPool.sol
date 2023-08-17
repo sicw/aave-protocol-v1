@@ -402,8 +402,6 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         // Usage of a memory struct of vars to avoid "Stack too deep" errors due to local variables
         BorrowLocalVars memory vars;
 
-        console.log('isReserveBorrowingEnabled', core.isReserveBorrowingEnabled(_reserve));
-
         //check that the reserve is enabled for borrowing
         require(core.isReserveBorrowingEnabled(_reserve), "Reserve is not enabled for borrowing");
         //validate interest rate mode

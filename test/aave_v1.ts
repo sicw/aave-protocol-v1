@@ -230,18 +230,30 @@ describe("Aave v1", function () {
             const mockMANAFactory = await ethers.getContractFactory("MockMANA");
             const mockMANA = await mockMANAFactory.deploy();
 
-            const defaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
-            const defaultReserveInterestRateStrategy = await defaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+            const mockLINKFactory = await ethers.getContractFactory("MockLINK");
+            const mockLINK = await mockLINKFactory.connect(otherAccount).deploy();
+
+            const mockMANADefaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const mockMANADefaultReserveInterestRateStrategy = await mockMANADefaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
+
+            const mockLINKDefaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const mockLINKDefaultReserveInterestRateStrategy = await mockLINKDefaultReserveInterestRateStrategyFactory.deploy(await mockLINK.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
 
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
-            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await defaultReserveInterestRateStrategy.getAddress());
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await mockMANADefaultReserveInterestRateStrategy.getAddress());
+            await lendingPoolConfiguratorProxy.initReserve(await mockLINK.getAddress(), 18, await mockLINKDefaultReserveInterestRateStrategy.getAddress());
 
             await mockMANA.mint(20000);
             await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
             await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
 
-            expect(await ethers.provider.getBalance(await otherAccount.getAddress())).to.equal(10000000000000000000000n);
+            await mockLINK.connect(otherAccount).mint(20000);
+            await mockLINK.connect(otherAccount).approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            await lendingPoolProxy.connect(otherAccount).deposit(await mockLINK.getAddress(), 10000, 0);
+
+            // 开启资金池借款
+            await lendingPoolConfiguratorProxy.enableBorrowingOnReserve(await mockMANA.getAddress(), true);
 
             await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 100, 1, 0);
 
