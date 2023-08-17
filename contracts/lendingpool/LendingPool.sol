@@ -18,6 +18,8 @@ import "./LendingPoolDataProvider.sol";
 import "./LendingPoolLiquidationManager.sol";
 import "../libraries/EthAddressLib.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title LendingPool contract
 * @notice Implements the actions of the LendingPool, and exposes accessory methods to fetch the users and reserve data
@@ -399,6 +401,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     {
         // Usage of a memory struct of vars to avoid "Stack too deep" errors due to local variables
         BorrowLocalVars memory vars;
+
+        console.log('isReserveBorrowingEnabled', core.isReserveBorrowingEnabled(_reserve));
 
         //check that the reserve is enabled for borrowing
         require(core.isReserveBorrowingEnabled(_reserve), "Reserve is not enabled for borrowing");

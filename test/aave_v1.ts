@@ -243,7 +243,7 @@ describe("Aave v1", function () {
 
             expect(await ethers.provider.getBalance(await otherAccount.getAddress())).to.equal(10000000000000000000000n);
 
-            await lendingPoolProxy.attach(await otherAccount.getAddress()).borrow(await mockMANA.getAddress(), 100, 1, 0);
+            await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 100, 1, 0);
 
             expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(100n);
         });
