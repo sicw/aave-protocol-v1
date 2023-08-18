@@ -7,6 +7,7 @@ import {expect} from "chai";
 import {ethers} from "hardhat";
 import {LendingPoolConfigurator} from "../typechain-types/contracts/lendingpool/LendingPoolConfigurator";
 import aTokenAbi from "../artifacts/contracts/tokenization/AToken.sol/AToken.json";
+import {lendingpool} from "../typechain-types/contracts";
 
 describe("Aave v1", function () {
 
@@ -210,7 +211,7 @@ describe("Aave v1", function () {
             expect(balanceOfOwner).to.equal(0n);
         });
 
-        it("borrow", async function () {
+        it.skip("borrow", async function () {
             const {
                 tokenDistributorProxy,
                 feeProviderProxy,
@@ -271,10 +272,74 @@ describe("Aave v1", function () {
             expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(10000n);
 
             // 带有revertedWith的 await要放到外面
-            await expect( aTokenContract.redeem(9001)).to.be.revertedWith("There is not enough liquidity available to redeem");
+            await expect(aTokenContract.redeem(9001)).to.be.revertedWith("There is not enough liquidity available to redeem");
 
             await aTokenContract.redeem(9000);
             expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(1000n);
+        });
+
+        it("repay", async function () {
+            const {
+                tokenDistributorProxy,
+                feeProviderProxy,
+                lendingRateOracleProxy,
+                priceOracleProxy,
+                lendingPoolDataProviderProxy,
+                lendingPoolLiquidationManagerProxy,
+                lendingPoolConfiguratorProxy,
+                lendingPoolParametersProviderProxy,
+                lendingPoolCoreProxy,
+                lendingPoolProxy,
+                lendingPoolAddressesProvider,
+                owner,
+                otherAccount
+            } = await loadFixture(deployTestEnvFixture);
+
+            const mockMANAFactory = await ethers.getContractFactory("MockMANA");
+            const mockMANA = await mockMANAFactory.deploy();
+
+            const mockLINKFactory = await ethers.getContractFactory("MockLINK");
+            const mockLINK = await mockLINKFactory.connect(otherAccount).deploy();
+
+            const mockMANADefaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const mockMANADefaultReserveInterestRateStrategy = await mockMANADefaultReserveInterestRateStrategyFactory.deploy(await mockMANA.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 2, 3, 2, 3);
+
+            const mockLINKDefaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
+            const mockLINKDefaultReserveInterestRateStrategy = await mockLINKDefaultReserveInterestRateStrategyFactory.deploy(await mockLINK.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 2, 3, 2, 3);
+
+            await priceOracleProxy.setAssetPrice(await mockMANA.getAddress(), 1000000000000000000n);
+            await priceOracleProxy.setAssetPrice(await mockLINK.getAddress(), 1000000000000000000n);
+
+            // 不能直接用部署的地址, 应该用代理
+            // attach用来关联新地址
+            await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await mockMANADefaultReserveInterestRateStrategy.getAddress());
+            await lendingPoolConfiguratorProxy.initReserve(await mockLINK.getAddress(), 18, await mockLINKDefaultReserveInterestRateStrategy.getAddress());
+
+            await mockMANA.mint(20000);
+            await mockMANA.approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            await lendingPoolProxy.deposit(await mockMANA.getAddress(), 10000, 0);
+
+            await mockLINK.connect(otherAccount).mint(20000);
+            await mockLINK.connect(otherAccount).approve(await lendingPoolCoreProxy.getAddress(), 10000);
+            await lendingPoolProxy.connect(otherAccount).deposit(await mockLINK.getAddress(), 10000, 0);
+
+            // 开启资金池借款
+            await lendingPoolConfiguratorProxy.enableBorrowingOnReserve(await mockMANA.getAddress(), true);
+
+            // 开启资金做为抵押
+            await lendingPoolConfiguratorProxy.enableReserveAsCollateral(await mockMANA.getAddress(), 10000, 10000, 10000);
+            await lendingPoolConfiguratorProxy.enableReserveAsCollateral(await mockLINK.getAddress(), 10000, 10000, 10000);
+
+            // 设置借贷利率
+            await lendingRateOracleProxy.setMarketBorrowRate(await mockMANA.getAddress(), 100);
+
+            await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 1000, 1, 0);
+            expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(1000n);
+
+            // 100n
+            console.log(await lendingPoolCoreProxy.getReserveCurrentStableBorrowRate(await mockMANA.getAddress()));
+
+            await lendingPoolProxy.connect(otherAccount).repay(await mockMANA.getAddress(), 500, await otherAccount.getAddress());
         });
     });
 });

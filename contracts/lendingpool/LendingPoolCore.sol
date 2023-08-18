@@ -14,6 +14,8 @@ import "../libraries/WadRayMath.sol";
 import "../tokenization/AToken.sol";
 import "../libraries/EthAddressLib.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title LendingPoolCore contract
 * @author Aave
@@ -1322,6 +1324,8 @@ contract LendingPoolCore is VersionedInitializable {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
+        console.log('_rateMode == CoreLibrary.InterestRateMode.STABLE', _rateMode == CoreLibrary.InterestRateMode.STABLE);
+        console.log('reserve.currentStableBorrowRate', reserve.currentStableBorrowRate);
         if (_rateMode == CoreLibrary.InterestRateMode.STABLE) {
             //stable
             //reset the user variable index, and update the stable rate
@@ -1721,6 +1725,8 @@ contract LendingPoolCore is VersionedInitializable {
         reserve.currentLiquidityRate = newLiquidityRate;
         reserve.currentStableBorrowRate = newStableRate;
         reserve.currentVariableBorrowRate = newVariableRate;
+
+        console.log('reserve.currentStableBorrowRate',reserve.currentStableBorrowRate);
 
         //solium-disable-next-line
         reserve.lastUpdateTimestamp = uint40(block.timestamp);

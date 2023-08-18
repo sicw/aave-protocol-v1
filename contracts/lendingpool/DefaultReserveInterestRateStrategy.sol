@@ -8,6 +8,8 @@ import "../interfaces/ILendingRateOracle.sol";
 
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title DefaultReserveInterestRateStrategy contract
 * @notice implements the calculation of the interest rates depending on the reserve parameters.
@@ -129,6 +131,8 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
         currentStableBorrowRate = ILendingRateOracle(addressesProvider.getLendingRateOracle())
             .getMarketBorrowRate(_reserve);
 
+        console.log('currentStableBorrowRate',currentStableBorrowRate);
+        console.log('utilizationRate',utilizationRate);
         if (utilizationRate > OPTIMAL_UTILIZATION_RATE) {
             uint256 excessUtilizationRateRatio = utilizationRate
                 .sub(OPTIMAL_UTILIZATION_RATE)
@@ -137,7 +141,7 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
             currentStableBorrowRate = currentStableBorrowRate.add(stableRateSlope1).add(
                 stableRateSlope2.rayMul(excessUtilizationRateRatio)
             );
-
+            console.log('currentStableBorrowRate1',currentStableBorrowRate);
             currentVariableBorrowRate = baseVariableBorrowRate.add(variableRateSlope1).add(
                 variableRateSlope2.rayMul(excessUtilizationRateRatio)
             );
@@ -149,6 +153,7 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
                     )
                 )
             );
+            console.log('currentStableBorrowRate2',currentStableBorrowRate);
             currentVariableBorrowRate = baseVariableBorrowRate.add(
                 utilizationRate.rayDiv(OPTIMAL_UTILIZATION_RATE).rayMul(variableRateSlope1)
             );
