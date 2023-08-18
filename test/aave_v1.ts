@@ -263,8 +263,16 @@ describe("Aave v1", function () {
             await lendingPoolConfiguratorProxy.enableReserveAsCollateral(await mockLINK.getAddress(), 10000, 10000, 10000);
 
             await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 1000, 1, 0);
-
             expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(1000n);
+
+            const aTokenAddress = await lendingPoolCoreProxy.getReserveATokenAddress(await mockMANA.getAddress());
+            const aTokenContract = await ethers.getContractAt(aTokenAbi.abi, aTokenAddress, owner);
+            expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(10000n);
+
+            await expect( aTokenContract.redeem(9001)).to.be.revertedWith("There is not enough liquidity available to redeem");
+
+            await aTokenContract.redeem(9000);
+            expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(1000n);
         });
     });
 });
