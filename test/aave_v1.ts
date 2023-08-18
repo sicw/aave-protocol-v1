@@ -267,8 +267,10 @@ describe("Aave v1", function () {
 
             const aTokenAddress = await lendingPoolCoreProxy.getReserveATokenAddress(await mockMANA.getAddress());
             const aTokenContract = await ethers.getContractAt(aTokenAbi.abi, aTokenAddress, owner);
+            // 数值类型比较 await放到里面
             expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(10000n);
 
+            // 带有revertedWith的 await要放到外面
             await expect( aTokenContract.redeem(9001)).to.be.revertedWith("There is not enough liquidity available to redeem");
 
             await aTokenContract.redeem(9000);
