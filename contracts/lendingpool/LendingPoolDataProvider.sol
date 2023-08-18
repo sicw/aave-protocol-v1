@@ -12,6 +12,8 @@ import "../tokenization/AToken.sol";
 
 import "./LendingPoolCore.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title LendingPoolDataProvider contract
 * @author Aave
@@ -88,6 +90,8 @@ contract LendingPoolDataProvider is VersionedInitializable {
 
         address[] memory reserves = core.getReserves();
 
+        console.log('reserves length',reserves.length);
+
         for (uint256 i = 0; i < reserves.length; i++) {
             vars.currentReserve = reserves[i];
 
@@ -98,7 +102,15 @@ contract LendingPoolDataProvider is VersionedInitializable {
                 vars.userUsesReserveAsCollateral
             ) = core.getUserBasicReserveData(vars.currentReserve, _user);
 
-            if (vars.compoundedLiquidityBalance == 0 && vars.compoundedBorrowBalance == 0) {
+            console.log('vars.compoundedLiquidityBalance',vars.compoundedLiquidityBalance);
+            console.log('vars.compoundedBorrowBalance',vars.compoundedBorrowBalance);
+            console.log('vars.originationFee',vars.originationFee);
+            console.log('vars.userUsesReserveAsCollateral',vars.userUsesReserveAsCollateral);
+
+            console.log('vars.compoundedLiquidityBalance',vars.compoundedLiquidityBalance);
+            console.log('vars.compoundedBorrowBalance',vars.compoundedBorrowBalance);
+
+        if (vars.compoundedLiquidityBalance == 0 && vars.compoundedBorrowBalance == 0) {
                 continue;
             }
 
@@ -110,8 +122,15 @@ contract LendingPoolDataProvider is VersionedInitializable {
                 vars.usageAsCollateralEnabled
             ) = core.getReserveConfiguration(vars.currentReserve);
 
+            console.log('vars.reserveDecimals',vars.reserveDecimals);
+            console.log('vars.baseLtv',vars.baseLtv);
+            console.log('vars.liquidationThreshold',vars.liquidationThreshold);
+            console.log('vars.usageAsCollateralEnabled',vars.usageAsCollateralEnabled);
+
             vars.tokenUnit = 10 ** vars.reserveDecimals;
             vars.reserveUnitPrice = oracle.getAssetPrice(vars.currentReserve);
+
+            console.log('vars.compoundedLiquidityBalance',vars.compoundedLiquidityBalance);
 
             //liquidity and collateral balance
             if (vars.compoundedLiquidityBalance > 0) {
@@ -119,9 +138,17 @@ contract LendingPoolDataProvider is VersionedInitializable {
                     .reserveUnitPrice
                     .mul(vars.compoundedLiquidityBalance)
                     .div(vars.tokenUnit);
+
+                console.log('vars.reserveUnitPrice', vars.reserveUnitPrice);
+                console.log('vars.tokenUnit', vars.tokenUnit);
+                console.log('liquidityBalanceETH', liquidityBalanceETH);
+
                 totalLiquidityBalanceETH = totalLiquidityBalanceETH.add(liquidityBalanceETH);
 
-                if (vars.usageAsCollateralEnabled && vars.userUsesReserveAsCollateral) {
+                console.log('vars.usageAsCollateralEnabled', vars.usageAsCollateralEnabled);
+                console.log('vars.userUsesReserveAsCollateral', vars.userUsesReserveAsCollateral);
+
+            if (vars.usageAsCollateralEnabled && vars.userUsesReserveAsCollateral) {
                     totalCollateralBalanceETH = totalCollateralBalanceETH.add(liquidityBalanceETH);
                     currentLtv = currentLtv.add(liquidityBalanceETH.mul(vars.baseLtv));
                     currentLiquidationThreshold = currentLiquidationThreshold.add(

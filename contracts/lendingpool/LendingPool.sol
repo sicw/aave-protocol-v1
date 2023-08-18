@@ -443,6 +443,8 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         //calculating fees
         vars.borrowFee = feeProvider.calculateLoanOriginationFee(msg.sender, _amount);
 
+        console.log('vars.borrowFee',vars.borrowFee);
+
         require(vars.borrowFee > 0, "The amount to borrow is too small");
 
         vars.amountOfCollateralNeededETH = dataProvider.calculateCollateralNeededInETH(

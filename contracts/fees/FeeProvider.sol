@@ -4,6 +4,7 @@ import "../libraries/openzeppelin-upgradeability/VersionedInitializable.sol";
 import "../interfaces/IFeeProvider.sol";
 import "../libraries/WadRayMath.sol";
 
+import "hardhat/console.sol";
 
 /**
 * @title FeeProvider contract
@@ -38,6 +39,9 @@ contract FeeProvider is IFeeProvider, VersionedInitializable {
     * @param _amount the amount of the loan
     **/
     function calculateLoanOriginationFee(address _user, uint256 _amount) external view returns (uint256) {
+        console.log('_amount',_amount);
+        console.log('originationFeePercentage',originationFeePercentage);
+        console.log('_amount.wadMul.originationFeePercentage',_amount.wadMul(originationFeePercentage));
         return _amount.wadMul(originationFeePercentage);
     }
 

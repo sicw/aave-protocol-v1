@@ -239,6 +239,9 @@ describe("Aave v1", function () {
             const mockLINKDefaultReserveInterestRateStrategyFactory = await ethers.getContractFactory("DefaultReserveInterestRateStrategy");
             const mockLINKDefaultReserveInterestRateStrategy = await mockLINKDefaultReserveInterestRateStrategyFactory.deploy(await mockLINK.getAddress(), await lendingPoolAddressesProvider.getAddress(), 1, 1, 1, 1, 1);
 
+            await priceOracleProxy.setAssetPrice(await mockMANA.getAddress(), 1000000000000000000n);
+            await priceOracleProxy.setAssetPrice(await mockLINK.getAddress(), 1000000000000000000n);
+
             // 不能直接用部署的地址, 应该用代理
             // attach用来关联新地址
             await lendingPoolConfiguratorProxy.initReserve(await mockMANA.getAddress(), 18, await mockMANADefaultReserveInterestRateStrategy.getAddress());
@@ -255,9 +258,13 @@ describe("Aave v1", function () {
             // 开启资金池借款
             await lendingPoolConfiguratorProxy.enableBorrowingOnReserve(await mockMANA.getAddress(), true);
 
-            await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 100, 1, 0);
+            // 开启资金做为抵押
+            await lendingPoolConfiguratorProxy.enableReserveAsCollateral(await mockMANA.getAddress(), 10000, 10000, 10000);
+            await lendingPoolConfiguratorProxy.enableReserveAsCollateral(await mockLINK.getAddress(), 10000, 10000, 10000);
 
-            expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(100n);
+            await lendingPoolProxy.connect(otherAccount).borrow(await mockMANA.getAddress(), 1000, 1, 0);
+
+            expect(await mockMANA.balanceOf(await otherAccount.getAddress())).to.equal(1000n);
         });
     });
 });
