@@ -74,9 +74,13 @@ contract LendingPoolCore is VersionedInitializable {
         _;
     }
 
+    // 资产地址 -> 资产数据
     mapping(address => CoreLibrary.ReserveData) internal reserves;
+
+    // 用户地址 -> 资产地址 -> 用户资产数据
     mapping(address => mapping(address => CoreLibrary.UserReserveData)) internal usersReserveData;
 
+    // 全部资产
     address[] public reservesList;
 
     uint256 public constant CORE_REVISION = 0x6;
