@@ -113,20 +113,23 @@ library CoreLibrary {
         uint256 totalBorrows = getTotalBorrows(_self);
 
         if (totalBorrows > 0) {
+            // (当前时间 - 上次更新时间) / 一年时间 * 利率(年化利率)
             //only cumulating if there is any income being produced
             uint256 cumulatedLiquidityInterest = calculateLinearInterest(
                 _self.currentLiquidityRate,
                 _self.lastUpdateTimestamp
             );
-
+            // 初始cumulatedLiquidityInterest = 1e27
             _self.lastLiquidityCumulativeIndex = cumulatedLiquidityInterest.rayMul(
                 _self.lastLiquidityCumulativeIndex
             );
 
+            // ((利率 / 一年的时间) + 1e27) ^ (当前时间 - 上次更新时间)
             uint256 cumulatedVariableBorrowInterest = calculateCompoundedInterest(
                 _self.currentVariableBorrowRate,
                 _self.lastUpdateTimestamp
             );
+            // 初始lastVariableBorrowCumulativeIndex = 1e27
             _self.lastVariableBorrowCumulativeIndex = cumulatedVariableBorrowInterest.rayMul(
                 _self.lastVariableBorrowCumulativeIndex
             );

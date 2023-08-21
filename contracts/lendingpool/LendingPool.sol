@@ -311,8 +311,10 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
         // 取出来后, 再存储时又是第一次Deposit
         bool isFirstDeposit = aToken.balanceOf(msg.sender) == 0;
 
+        // 更新利率
         core.updateStateOnDeposit(_reserve, msg.sender, _amount, isFirstDeposit);
 
+        // 1:1 mint to msg.sender atoken
         //minting AToken to user 1:1 with the specific exchange rate
         aToken.mintOnDeposit(msg.sender, _amount);
 

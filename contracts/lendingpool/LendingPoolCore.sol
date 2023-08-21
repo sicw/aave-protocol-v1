@@ -619,6 +619,7 @@ contract LendingPoolCore is VersionedInitializable {
     }
 
     /**
+    * 利率 * 时间系数 * 1e27
     * @dev gets the normalized income of the reserve. a value of 1e27 means there is no income. A value of 2e27 means there
     * there has been 100% income.
     * @param _reserve the reserve address
