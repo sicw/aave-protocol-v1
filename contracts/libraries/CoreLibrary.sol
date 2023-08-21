@@ -109,6 +109,7 @@ library CoreLibrary {
     * @param _self the reserve object
     **/
     function updateCumulativeIndexes(ReserveData storage _self) internal {
+        // 全部借出去的资产(固定 + 可变利率)
         uint256 totalBorrows = getTotalBorrows(_self);
 
         if (totalBorrows > 0) {

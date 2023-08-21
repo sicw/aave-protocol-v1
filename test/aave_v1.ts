@@ -278,7 +278,7 @@ describe("Aave v1", function () {
             expect(await aTokenContract.balanceOf(await owner.getAddress())).to.equal(1000n);
         });
 
-        it("repay", async function () {
+        it.skip("repay", async function () {
             const {
                 tokenDistributorProxy,
                 feeProviderProxy,

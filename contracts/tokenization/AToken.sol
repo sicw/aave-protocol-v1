@@ -271,11 +271,13 @@ contract AToken is ERC20, ERC20Detailed {
     function mintOnDeposit(address _account, uint256 _amount) external onlyLendingPool {
 
         //cumulates the balance of the user
+        // mint累计收益(复利)
         (,
         ,
         uint256 balanceIncrease,
         uint256 index) = cumulateBalanceInternal(_account);
 
+        // 重定向收益
          //if the user is redirecting his interest towards someone else,
         //we update the redirected balance of the redirection address by adding the accrued interest
         //and the amount deposited
