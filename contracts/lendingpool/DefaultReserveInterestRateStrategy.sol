@@ -122,17 +122,22 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
             uint256 currentVariableBorrowRate
         )
     {
+        // 总借款 = 稳定利率借款 + 可变利率借款
         uint256 totalBorrows = _totalBorrowsStable.add(_totalBorrowsVariable);
 
+        // 借款使用率
         uint256 utilizationRate = (totalBorrows == 0 && _availableLiquidity == 0)
             ? 0
             : totalBorrows.rayDiv(_availableLiquidity.add(totalBorrows));
 
+        // 稳定利率
         currentStableBorrowRate = ILendingRateOracle(addressesProvider.getLendingRateOracle())
             .getMarketBorrowRate(_reserve);
 
         console.log('currentStableBorrowRate',currentStableBorrowRate);
         console.log('utilizationRate',utilizationRate);
+
+        // > 80%最佳使用率
         if (utilizationRate > OPTIMAL_UTILIZATION_RATE) {
             uint256 excessUtilizationRateRatio = utilizationRate
                 .sub(OPTIMAL_UTILIZATION_RATE)

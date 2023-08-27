@@ -34,26 +34,47 @@ library CoreLibrary {
         /**
         * @dev refer to the whitepaper, section 1.1 basic concepts for a formal description of these properties.
         **/
+        // 流动性累计指数
         //the liquidity index. Expressed in ray
         uint256 lastLiquidityCumulativeIndex;
+
+        // 流动性利率
         //the current supply rate. Expressed in ray
         uint256 currentLiquidityRate;
+
+        // 稳定性利率借款
         //the total borrows of the reserve at a stable rate. Expressed in the currency decimals
         uint256 totalBorrowsStable;
+
+        // 可变利率借款
         //the total borrows of the reserve at a variable rate. Expressed in the currency decimals
         uint256 totalBorrowsVariable;
+
+        // 可变利率借款利率
         //the current variable borrow rate. Expressed in ray
         uint256 currentVariableBorrowRate;
+
+        // 稳定利率借款利率
         //the current stable borrow rate. Expressed in ray
         uint256 currentStableBorrowRate;
+
+        // 平均借款利率(不同利率权重和)
         //the current average stable borrow rate (weighted average of all the different stable rate loans). Expressed in ray
         uint256 currentAverageStableBorrowRate;
+
+        // 可变利率累计指数
         //variable borrow index. Expressed in ray
         uint256 lastVariableBorrowCumulativeIndex;
+
+        //
         //the ltv of the reserve. Expressed in percentage (0-100)
         uint256 baseLTVasCollateral;
+
+        // 流动性阈值
         //the liquidation threshold of the reserve. Expressed in percentage (0-100)
         uint256 liquidationThreshold;
+
+        //
         //the liquidation bonus of the reserve. Expressed in percentage
         uint256 liquidationBonus;
         //the decimals of the reserve asset
@@ -109,27 +130,23 @@ library CoreLibrary {
     * @param _self the reserve object
     **/
     function updateCumulativeIndexes(ReserveData storage _self) internal {
-        // 全部借出去的资产(固定利息 + 可变利息)
         uint256 totalBorrows = getTotalBorrows(_self);
 
         if (totalBorrows > 0) {
-            // (当前时间 - 上次更新时间) / 一年时间 * 利率(年化利率)
             //only cumulating if there is any income being produced
+            // 计算流动性指数
             uint256 cumulatedLiquidityInterest = calculateLinearInterest(
                 _self.currentLiquidityRate,
                 _self.lastUpdateTimestamp
             );
-            // 初始cumulatedLiquidityInterest = 1e27
             _self.lastLiquidityCumulativeIndex = cumulatedLiquidityInterest.rayMul(
                 _self.lastLiquidityCumulativeIndex
             );
 
-            // ((利率 / 一年的时间) + 1e27) ^ (当前时间 - 上次更新时间)
             uint256 cumulatedVariableBorrowInterest = calculateCompoundedInterest(
                 _self.currentVariableBorrowRate,
                 _self.lastUpdateTimestamp
             );
-            // 初始lastVariableBorrowCumulativeIndex = 1e27
             _self.lastVariableBorrowCumulativeIndex = cumulatedVariableBorrowInterest.rayMul(
                 _self.lastVariableBorrowCumulativeIndex
             );
