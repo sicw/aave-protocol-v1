@@ -143,6 +143,7 @@ library CoreLibrary {
                 _self.lastLiquidityCumulativeIndex
             );
 
+            // 计算借款累计指数
             uint256 cumulatedVariableBorrowInterest = calculateCompoundedInterest(
                 _self.currentVariableBorrowRate,
                 _self.lastUpdateTimestamp

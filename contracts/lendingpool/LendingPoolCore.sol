@@ -116,7 +116,10 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _amount,
         bool _isFirstDeposit
     ) external onlyLendingPool {
+        // 更新流动性指数 && 借贷指数
         reserves[_reserve].updateCumulativeIndexes();
+
+        // 更新流动性利率 && 借款(稳定、可变)利率
         updateReserveInterestRatesAndTimestampInternal(_reserve, _amount, 0);
 
         if (_isFirstDeposit) {
@@ -191,6 +194,7 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _borrowFee,
         CoreLibrary.InterestRateMode _rateMode
     ) external onlyLendingPool returns (uint256, uint256) {
+        // 返回值是 (借款本金,,复息)
         // getting the previous borrow data of the user
         (uint256 principalBorrowBalance, , uint256 balanceIncrease) = getUserBorrowBalances(
             _reserve,
@@ -1688,6 +1692,7 @@ contract LendingPoolCore is VersionedInitializable {
             reserve.decreaseTotalBorrowsVariable(_principalBalance);
         }
 
+        // 复息计算, 把借款产生的利息也算在内
         uint256 newPrincipalAmount = _principalBalance.add(_balanceIncrease).add(_amountBorrowed);
         if (_newBorrowRateMode == CoreLibrary.InterestRateMode.STABLE) {
             reserve.increaseTotalBorrowsStableAndUpdateAverageRate(
