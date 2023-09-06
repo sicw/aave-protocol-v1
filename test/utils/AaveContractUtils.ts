@@ -25,4 +25,8 @@ export class AaveContractUtils {
         return new hre.ethers.Contract(lendingPoolCoreAddress, LendingPoolCoreABI.abi, signer);
     }
 
+    static async getLendingPoolCoreWithAddress(address : string) {
+        const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
+        return new hre.ethers.Contract(address, LendingPoolCoreABI.abi, signer);
+    }
 }

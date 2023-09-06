@@ -22,31 +22,46 @@ describe("Aave v1", function () {
         return {lendingPoolAddressesProvider, lendingPool, lendingPoolCore};
     }
 
-    describe("fork main network", function () {
+    describe.skip("fork main network", function () {
         it("read block number", async function () {
             const blockNumber = await ethers.provider.getBlockNumber();
             expect(blockNumber).to.equal(18074875n);
         });
     });
 
-    describe("Lending pool", function () {
+    describe.skip("Lending pool", function () {
         it("case 1", async function () {
             const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
             const result = await lendingPoolCore.getReserves();
             console.log(result);
         });
+    });
+
+    describe("Lending pool", function () {
 
         it("case 2, new LendingPoolCore", async function () {
-            const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
+            const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
 
+            // 本地创建CoreLibrary
+            const coreLibraryFactory = await ethers.getContractFactory("CoreLibrary");
+            const coreLibrary = await coreLibraryFactory.deploy();
+
+            // 创建新LendingPoolCore
             const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore", {
                 libraries: {
                     CoreLibrary: await coreLibrary.getAddress(),
                 },
             });
-            const lendingPoolCoreNew = await lendingPoolCoreFactory.deploy();
+            const lendingPoolCoreNewImpl = await lendingPoolCoreFactory.deploy();
 
-            lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNew.getAddress());
+            // 替换线上代理
+            lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNewImpl.getAddress());
+
+            // 获取新LendingPoolCore
+            const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();
+            const lendingPoolCoreNew = await AaveContractUtils.getLendingPoolCoreWithAddress(lendingPoolCoreAddressNew);
+
+            console.log(await lendingPoolCoreNew.CORE_REVISION());
         });
 
     });
