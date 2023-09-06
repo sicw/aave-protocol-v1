@@ -1,6 +1,6 @@
 import hre from 'hardhat'
-import AaveProtocolDataProviderABI
-    from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/lendingpool/LendingPoolDataProvider.sol/LendingPoolDataProvider.json";
+import LendingPoolAddressesProviderABI
+    from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/configuration/LendingPoolAddressesProvider.sol/LendingPoolAddressesProvider.json";
 import LendingPoolABI
     from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/lendingpool/LendingPool.sol/LendingPool.json";
 import LendingPoolCoreABI
@@ -10,9 +10,9 @@ import {lendingPoolAddress, lendingPoolAddressesProviderAddress, lendingPoolCore
 import {impersonateAccount} from "../constants/address";
 
 export class AaveContractUtils {
-    static async getProtocolDataProvider() {
+    static async getLendingPoolAddressesProvider() {
         const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
-        return new hre.ethers.Contract(lendingPoolAddressesProviderAddress, AaveProtocolDataProviderABI.abi, signer);
+        return new hre.ethers.Contract(lendingPoolAddressesProviderAddress, LendingPoolAddressesProviderABI.abi, signer);
     }
 
     static async getLendingPool() {

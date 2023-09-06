@@ -16,10 +16,10 @@ import {defaultSolcOutputSelection} from "hardhat/internal/core/config/default-c
 describe("Aave v1", function () {
 
     async function deployTestEnvFixture() {
-        const protocolDataProvider = await AaveContractUtils.getProtocolDataProvider();
+        const lendingPoolAddressesProvider = await AaveContractUtils.getLendingPoolAddressesProvider();
         const lendingPool = await AaveContractUtils.getLendingPool();
         const lendingPoolCore = await AaveContractUtils.getLendingPoolCore();
-        return {protocolDataProvider, lendingPool, lendingPoolCore};
+        return {lendingPoolAddressesProvider, lendingPool, lendingPoolCore};
     }
 
     describe("fork main network", function () {
@@ -30,10 +30,20 @@ describe("Aave v1", function () {
     });
 
     describe("Lending pool", function () {
-        it("test case 1", async function () {
-            const {protocolDataProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
+        it("case 1", async function () {
+            const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
             const result = await lendingPoolCore.getReserves();
             console.log(result);
         });
+
+        it("case 2, new LendingPoolCore", async function () {
+            const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
+
+            const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore");
+            const lendingPoolCoreNew = await lendingPoolCoreFactory.deploy();
+
+            lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNew.getAddress());
+        });
+
     });
 });
