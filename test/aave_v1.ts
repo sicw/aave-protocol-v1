@@ -39,7 +39,11 @@ describe("Aave v1", function () {
         it("case 2, new LendingPoolCore", async function () {
             const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
 
-            const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore");
+            const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore", {
+                libraries: {
+                    CoreLibrary: await coreLibrary.getAddress(),
+                },
+            });
             const lendingPoolCoreNew = await lendingPoolCoreFactory.deploy();
 
             lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNew.getAddress());
