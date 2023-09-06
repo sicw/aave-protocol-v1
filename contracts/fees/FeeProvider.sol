@@ -39,9 +39,6 @@ contract FeeProvider is IFeeProvider, VersionedInitializable {
     * @param _amount the amount of the loan
     **/
     function calculateLoanOriginationFee(address _user, uint256 _amount) external view returns (uint256) {
-        console.log('_amount',_amount);
-        console.log('originationFeePercentage',originationFeePercentage);
-        console.log('_amount.wadMul.originationFeePercentage',_amount.wadMul(originationFeePercentage));
         return _amount.wadMul(originationFeePercentage);
     }
 
