@@ -4,15 +4,23 @@ import {
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import {anyValue} from "@nomicfoundation/hardhat-chai-matchers/withArgs";
 import {expect} from "chai";
-import {ethers} from "hardhat";
+import hre, {ethers} from "hardhat";
 import {LendingPoolConfigurator} from "../typechain-types/contracts/lendingpool/LendingPoolConfigurator";
 import aTokenAbi from "../artifacts/contracts/tokenization/AToken.sol/AToken.json";
 import {lendingpool} from "../typechain-types/contracts";
 import {AccountUtil} from "./utils/AccountUtil";
-import {aaveDeployer2Address, aaveDeployer7Address, ethRicherAddress, impersonateAccount} from "./constants/address";
+import {
+    aaveDeployer2Address,
+    aaveDeployer7Address,
+    ethRicherAddress,
+    impersonateAccount,
+    lendingPoolAddressesProviderAddress
+} from "./constants/address";
 import {AaveContractUtils} from "./utils/AaveContractUtils";
 import {defaultSolcOutputSelection} from "hardhat/internal/core/config/default-config";
 import {EthUtil} from "./utils/EthUtil";
+import LendingPoolAddressesProviderABI
+    from "../artifacts/contracts/configuration/LendingPoolAddressesProvider.sol/LendingPoolAddressesProvider.json";
 
 describe("Aave v1", function () {
 
@@ -38,9 +46,35 @@ describe("Aave v1", function () {
         });
     });
 
+    describe.skip("Lending pool", function () {
+        it("update fee provider address", async function () {
+            const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
+            const lendingPoolAddressesProvider = new hre.ethers.Contract(lendingPoolAddressesProviderAddress, LendingPoolAddressesProviderABI.abi, signer);
+            await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
+
+            console.log(1)
+            await lendingPoolAddressesProvider.setTokenDistributor('0xebb17ec2bce083605a9a665cbd905ece11e5498a');
+            console.log(2)
+
+            const feeProviderFactory = await ethers.getContractFactory("FeeProvider");
+            const feeProviderNew = await feeProviderFactory.deploy();
+
+            // 关键点: 设置合约的version要大于原来的版本
+            // 线上version = 3
+            // 所以设置为3以上即可
+            await lendingPoolAddressesProvider.setFeeProviderImpl(await feeProviderNew.getAddress());
+            console.log(3)
+
+            // 替换线上代理
+            //await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
+            // const newLendingPoolCoreImplAddress = await lendingPoolCoreNewImpl.getAddress();
+            //await lendingPoolAddressesProvider.setLendingPoolCoreImpl('0x2847a5d7ce69790cb40471d454feb21a0be1f2e3');
+        });
+    });
+
     describe("Lending pool", function () {
 
-        it("case 2, new LendingPoolCore", async function () {
+        it("set new LendingPoolCore address", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
 
             // 本地创建CoreLibrary
@@ -57,7 +91,8 @@ describe("Aave v1", function () {
 
             // 替换线上代理
             await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
-            await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNewImpl.getAddress());
+            const newLendingPoolCoreImplAddress = await lendingPoolCoreNewImpl.getAddress();
+            await lendingPoolAddressesProvider.setLendingPoolCoreImpl(newLendingPoolCoreImplAddress);
 
             // 获取新LendingPoolCore
             const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();

@@ -6,6 +6,8 @@ import "../libraries/openzeppelin-upgradeability/InitializableAdminUpgradeabilit
 import "./AddressStorage.sol";
 import "../interfaces/ILendingPoolAddressesProvider.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title LendingPoolAddressesProvider contract
 * @notice Is the main registry of the protocol. All the different components of the protocol are accessible
