@@ -9,9 +9,10 @@ import {LendingPoolConfigurator} from "../typechain-types/contracts/lendingpool/
 import aTokenAbi from "../artifacts/contracts/tokenization/AToken.sol/AToken.json";
 import {lendingpool} from "../typechain-types/contracts";
 import {AccountUtil} from "./utils/AccountUtil";
-import {impersonateAccount} from "./constants/address";
+import {aaveDeployer2Address, aaveDeployer7Address, ethRicherAddress, impersonateAccount} from "./constants/address";
 import {AaveContractUtils} from "./utils/AaveContractUtils";
 import {defaultSolcOutputSelection} from "hardhat/internal/core/config/default-config";
+import {EthUtil} from "./utils/EthUtil";
 
 describe("Aave v1", function () {
 
@@ -55,7 +56,8 @@ describe("Aave v1", function () {
             const lendingPoolCoreNewImpl = await lendingPoolCoreFactory.deploy();
 
             // 替换线上代理
-            lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNewImpl.getAddress());
+            await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
+            await lendingPoolAddressesProvider.setLendingPoolCoreImpl(await lendingPoolCoreNewImpl.getAddress());
 
             // 获取新LendingPoolCore
             const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();

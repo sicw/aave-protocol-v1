@@ -13,5 +13,9 @@ export const usdtAddress = '0xdac17f958d2ee523a2206206994597c13d831ec7';
 export const daiRicherAddress = '0xbf702ea18bb1ab2a710394993a576ec61476ccf3';
 export const usdcRicherAddress = '0x18F4638b52232d8780b18115dBa89cce1c396Eeb';
 export const usdtRicherAddress = '0x8558FE88F8439dDcd7453ccAd6671Dfd90657a32';
+export const ethRicherAddress = '0xfe01a216234f79CFc3bea7513e457C6a9e50250d';
+
+export const aaveDeployer2Address = '0x2fbB0c60a41cB7Ea5323071624dCEAD3d213D0Fa';
+export const aaveDeployer7Address = '0xee56e2b3d491590b5b31738cc34d5232f378a8d5';
 
 export const impersonateAccount = '0xebb17ec2bce083605a9a665cbd905ece11e5498a';

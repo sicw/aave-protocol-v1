@@ -6,27 +6,33 @@ import LendingPoolABI
 import LendingPoolCoreABI
     from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/lendingpool/LendingPoolCore.sol/LendingPoolCore.json";
 import {AccountUtil} from "./AccountUtil";
-import {lendingPoolAddress, lendingPoolAddressesProviderAddress, lendingPoolCoreAddress} from "../constants/address";
+import {
+    aaveDeployer2Address, aaveDeployer7Address,
+    ethRicherAddress,
+    lendingPoolAddress,
+    lendingPoolAddressesProviderAddress,
+    lendingPoolCoreAddress
+} from "../constants/address";
 import {impersonateAccount} from "../constants/address";
 
 export class AaveContractUtils {
     static async getLendingPoolAddressesProvider() {
-        const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
+        const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
         return new hre.ethers.Contract(lendingPoolAddressesProviderAddress, LendingPoolAddressesProviderABI.abi, signer);
     }
 
     static async getLendingPool() {
-        const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
+        const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
         return new hre.ethers.Contract(lendingPoolAddress, LendingPoolABI.abi, signer);
     }
 
     static async getLendingPoolCore() {
-        const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
+        const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
         return new hre.ethers.Contract(lendingPoolCoreAddress, LendingPoolCoreABI.abi, signer);
     }
 
     static async getLendingPoolCoreWithAddress(address : string) {
-        const signer = await AccountUtil.getImpersonateAccount(impersonateAccount);
+        const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
         return new hre.ethers.Contract(address, LendingPoolCoreABI.abi, signer);
     }
 }
