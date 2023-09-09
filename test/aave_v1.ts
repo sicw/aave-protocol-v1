@@ -11,7 +11,7 @@ import {lendingpool} from "../typechain-types/contracts";
 import {AccountUtil} from "./utils/AccountUtil";
 import {
     aaveDeployer2Address,
-    aaveDeployer7Address,
+    aaveDeployer7Address, aDAIAddress, daiAddress,
     ethRicherAddress,
     impersonateAccount,
     lendingPoolAddressesProviderAddress
@@ -98,8 +98,98 @@ describe("Aave v1", function () {
             const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();
             const lendingPoolCoreNew = await AaveContractUtils.getLendingPoolCoreWithAddress(lendingPoolCoreAddressNew);
 
-            console.log(await lendingPoolCoreNew.CORE_REVISION());
-        });
+            const getLendingPoolDataProviderAddress = await lendingPoolAddressesProvider.getLendingPoolDataProvider();
+            const lendingPoolDataProvider = await AaveContractUtils.getLendingPoolDataProvider(getLendingPoolDataProviderAddress);
 
+            console.log(`\n\n----------------getReserveConfigurationData----------------`)
+            const [ltv,
+                liquidationThreshold,
+                liquidationBonus,
+                rateStrategyAddress,
+                usageAsCollateralEnabled,
+                borrowingEnabled,
+                stableBorrowRateEnabled,
+                isActive]
+                = await lendingPoolDataProvider.getReserveConfigurationData(daiAddress);
+            console.log(`ltv:${ltv}`)
+            console.log(`liquidationThreshold:${liquidationThreshold}`)
+            console.log(`liquidationBonus:${liquidationBonus}`)
+            console.log(`rateStrategyAddress:${rateStrategyAddress}`)
+            console.log(`usageAsCollateralEnabled:${usageAsCollateralEnabled}`)
+            console.log(`borrowingEnabled:${borrowingEnabled}`)
+            console.log(`stableBorrowRateEnabled:${stableBorrowRateEnabled}`)
+            console.log(`isActive:${isActive}`)
+
+            console.log(`\n\n----------------getReserveData----------------`)
+            const [totalLiquidity,
+                availableLiquidity,
+                totalBorrowsStable,
+                totalBorrowsVariable,
+                liquidityRate,
+                variableBorrowRate,
+                stableBorrowRate,
+                averageStableBorrowRate,
+                utilizationRate,
+                liquidityIndex,
+                variableBorrowIndex,
+                aTokenAddress,
+                lastUpdateTimestamp]
+                = await lendingPoolDataProvider.getReserveData(daiAddress);
+            console.log(`totalLiquidity:${totalLiquidity}`)
+            console.log(`availableLiquidity:${availableLiquidity}`)
+            console.log(`totalBorrowsStable:${totalBorrowsStable}`)
+            console.log(`totalBorrowsVariable:${totalBorrowsVariable}`)
+            console.log(`liquidityRate:${liquidityRate}`)
+            console.log(`variableBorrowRate:${variableBorrowRate}`)
+            console.log(`stableBorrowRate:${stableBorrowRate}`)
+            console.log(`averageStableBorrowRate:${averageStableBorrowRate}`)
+            console.log(`utilizationRate:${utilizationRate}`)
+            console.log(`liquidityIndex:${liquidityIndex}`)
+            console.log(`variableBorrowIndex:${variableBorrowIndex}`)
+            console.log(`aTokenAddress:${aTokenAddress}`)
+            console.log(`lastUpdateTimestamp:${lastUpdateTimestamp}`)
+
+
+            console.log(`\n\n----------------getUserAccountData----------------`)
+            const [totalLiquidityETH,
+                totalCollateralETH,
+                totalBorrowsETH,
+                totalFeesETH,
+                availableBorrowsETH,
+                currentLiquidationThreshold,
+                userLtv,
+                healthFactor] = await lendingPoolDataProvider.getUserAccountData('0xC5EbBB67d0a19DF34899537A74FA67f8c2966f4E');
+            console.log(`totalLiquidityETH:${totalLiquidityETH}`)
+            console.log(`totalCollateralETH:${totalCollateralETH}`)
+            console.log(`totalBorrowsETH:${totalBorrowsETH}`)
+            console.log(`totalFeesETH:${totalFeesETH}`)
+            console.log(`availableBorrowsETH:${availableBorrowsETH}`)
+            console.log(`currentLiquidationThreshold:${currentLiquidationThreshold}`)
+            console.log(`ltv:${userLtv}`)
+            console.log(`healthFactor:${healthFactor}`)
+
+
+            console.log(`\n\n----------------getUserReserveData----------------`)
+            const [currentATokenBalance,
+                currentBorrowBalance,
+                principalBorrowBalance,
+                borrowRateMode,
+                borrowRate,
+                userLiquidityRate,
+                originationFee,
+                userVariableBorrowIndex,
+                userLastUpdateTimestamp,
+                userUsageAsCollateralEnabled] = await lendingPoolDataProvider.getUserReserveData(daiAddress, '0xC5EbBB67d0a19DF34899537A74FA67f8c2966f4E');
+            console.log(`currentATokenBalance:${currentATokenBalance}`)
+            console.log(`currentBorrowBalance:${currentBorrowBalance}`)
+            console.log(`principalBorrowBalance:${principalBorrowBalance}`)
+            console.log(`borrowRateMode:${borrowRateMode}`)
+            console.log(`borrowRate:${borrowRate}`)
+            console.log(`liquidityRate:${userLiquidityRate}`)
+            console.log(`originationFee:${originationFee}`)
+            console.log(`variableBorrowIndex:${userVariableBorrowIndex}`)
+            console.log(`lastUpdateTimestamp:${userLastUpdateTimestamp}`)
+            console.log(`usageAsCollateralEnabled:${userUsageAsCollateralEnabled}`)
+        });
     });
 });
