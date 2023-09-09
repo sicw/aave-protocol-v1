@@ -38,7 +38,7 @@ describe("Aave v1", function () {
         });
     });
 
-    describe.skip("Lending pool", function () {
+    describe.skip("getReserves", function () {
         it("case 1", async function () {
             const {lendingPoolAddressesProvider, lendingPool, lendingPoolCore} = await loadFixture(deployTestEnvFixture);
             const result = await lendingPoolCore.getReserves();
@@ -46,7 +46,7 @@ describe("Aave v1", function () {
         });
     });
 
-    describe.skip("Lending pool", function () {
+    describe.skip("update fee provider address", function () {
         it("update fee provider address", async function () {
             const signer = await AccountUtil.getImpersonateAccount(aaveDeployer7Address);
             const lendingPoolAddressesProvider = new hre.ethers.Contract(lendingPoolAddressesProviderAddress, LendingPoolAddressesProviderABI.abi, signer);
@@ -72,7 +72,29 @@ describe("Aave v1", function () {
         });
     });
 
-    describe("Lending pool", function () {
+    // tx: 0xf02364679b70045cacd1f21d8345bef39afa1390bb975f51a753d6b1541ba9e8
+    describe.skip("query borrow tx", function () {
+        it("update fee provider address", async function () {
+            const eventABI = ['event Borrow(address indexed _reserve,address indexed _user,uint256 _amount,uint256 _borrowRateMode,uint256 _borrowRate,uint256 _originationFee,uint256 _borrowBalanceIncrease,uint16 indexed _referral,uint256 _timestamp)'];
+            const iface = new ethers.Interface(eventABI);
+            const filterEncodeData = iface.encodeFilterTopics('Borrow', ['0x6b175474e89094c44da98b954eedeac495271d0f']);
+            const logs = await ethers.provider.getLogs({
+                fromBlock: 9241323,
+                toBlock: 12098222,
+                topics: filterEncodeData
+            });
+            console.log(logs);
+        });
+    });
+
+    describe.skip("get Ownerable address", function () {
+        it("case 1", async function () {
+            const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
+            console.log(await lendingPoolAddressesProvider.owner());
+        });
+    });
+
+    describe("get all data", function () {
 
         it("set new LendingPoolCore address", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
@@ -179,7 +201,7 @@ describe("Aave v1", function () {
                 originationFee,
                 userVariableBorrowIndex,
                 userLastUpdateTimestamp,
-                userUsageAsCollateralEnabled] = await lendingPoolDataProvider.getUserReserveData(daiAddress, '0xC5EbBB67d0a19DF34899537A74FA67f8c2966f4E');
+                userUsageAsCollateralEnabled] = await lendingPoolDataProvider.getUserReserveData(daiAddress, '0x5d3183cB8967e3C9b605dc35081E5778EE462328');
             console.log(`currentATokenBalance:${currentATokenBalance}`)
             console.log(`currentBorrowBalance:${currentBorrowBalance}`)
             console.log(`principalBorrowBalance:${principalBorrowBalance}`)
