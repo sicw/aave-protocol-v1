@@ -133,6 +133,16 @@ describe("Aave v1", function () {
                 stableBorrowRateEnabled,
                 isActive]
                 = await lendingPoolDataProvider.getReserveConfigurationData(daiAddress);
+            /*
+                ltv:75
+                liquidationThreshold:80
+                liquidationBonus:105
+                rateStrategyAddress:0x3bcf425EAf6185d4D478f3D9C858dEacc67CB05f
+                usageAsCollateralEnabled:true
+                borrowingEnabled:true
+                stableBorrowRateEnabled:true
+                isActive:true
+            * */
             console.log(`ltv:${ltv}`)
             console.log(`liquidationThreshold:${liquidationThreshold}`)
             console.log(`liquidationBonus:${liquidationBonus}`)
@@ -157,6 +167,22 @@ describe("Aave v1", function () {
                 aTokenAddress,
                 lastUpdateTimestamp]
                 = await lendingPoolDataProvider.getReserveData(daiAddress);
+
+            /*
+                totalLiquidity:2619.274103475205556991
+                availableLiquidity:1619.274103475205556991
+                totalBorrowsStable:0
+                totalBorrowsVariable:1000.000000000000000000
+                liquidityRate:12927846256478499344798900
+                variableBorrowRate:33861572913303013691138106
+                stableBorrowRate:115357033322569643811641941
+                averageStableBorrowRate:0
+                utilizationRate:381785166612848219058209703
+                liquidityIndex:1000000000000000000000000000
+                variableBorrowIndex:1000000000000000000000000000
+                aTokenAddress:0xfC1E690f61EFd961294b3e1Ce3313fBD8aa4f85d
+                lastUpdateTimestamp:1578506041
+            * */
             console.log(`totalLiquidity:${totalLiquidity}`)
             console.log(`availableLiquidity:${availableLiquidity}`)
             console.log(`totalBorrowsStable:${totalBorrowsStable}`)

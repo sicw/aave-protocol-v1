@@ -8,6 +8,13 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 @dev Provides mul and div function for wads (decimal numbers with 18 digits precision) and rays (decimals with 27 digits)
  */
 
+/*
+    类比: RMB
+    最小单位1分 精度就是1e2
+    最小单位1毛 精度就是1e1
+    1元 = 10毛 = 100分
+*/
+
 library WadRayMath {
     using SafeMath for uint256;
 
@@ -34,10 +41,13 @@ library WadRayMath {
         return halfWAD;
     }
 
+    // amount(120 * 1e18) * rate(0.0025) => amount * rate * 1e18 => amount * rate * 1e18 / 1e18
+    // b数值放大了1e18
     function wadMul(uint256 a, uint256 b) internal pure returns (uint256) {
         return halfWAD.add(a.mul(b)).div(WAD);
     }
 
+    // b数值放大了1e18
     function wadDiv(uint256 a, uint256 b) internal pure returns (uint256) {
         uint256 halfB = b / 2;
 
