@@ -66,17 +66,19 @@ library CoreLibrary {
         //variable borrow index. Expressed in ray
         uint256 lastVariableBorrowCumulativeIndex;
 
-        //
+        // ltv贷款价值比. 百分比表示
         //the ltv of the reserve. Expressed in percentage (0-100)
         uint256 baseLTVasCollateral;
 
-        // 流动性阈值
+        // 资产清算阈值, 以百分比表示
         //the liquidation threshold of the reserve. Expressed in percentage (0-100)
         uint256 liquidationThreshold;
 
-        //
+        // 清算收益, 以百分比表示
         //the liquidation bonus of the reserve. Expressed in percentage
         uint256 liquidationBonus;
+
+
         //the decimals of the reserve asset
         uint256 decimals;
         /**
@@ -94,8 +96,12 @@ library CoreLibrary {
         bool usageAsCollateralEnabled;
         // isStableBorrowRateEnabled = true means users can borrow at a stable rate
         bool isStableBorrowRateEnabled;
+
+        // 资产是否被激活, isActive = true激活意味着可以被配置
         // isActive = true means the reserve has been activated and properly configured
         bool isActive;
+
+        // isFreezed = true 意味着只允许偿还 和 赎回资产. 不允许存储, 借贷, 交换
         // isFreezed = true means the reserve only allows repays and redeems, but not deposits, new borrowings or rate swap
         bool isFreezed;
     }
