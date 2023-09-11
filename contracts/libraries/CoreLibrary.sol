@@ -34,11 +34,11 @@ library CoreLibrary {
         /**
         * @dev refer to the whitepaper, section 1.1 basic concepts for a formal description of these properties.
         **/
-        // 流动性累计指数
+        // 上次流动性累计指数
         //the liquidity index. Expressed in ray
         uint256 lastLiquidityCumulativeIndex;
 
-        // 流动性利率
+        // 当前流动性利率
         //the current supply rate. Expressed in ray
         uint256 currentLiquidityRate;
 
@@ -50,11 +50,11 @@ library CoreLibrary {
         //the total borrows of the reserve at a variable rate. Expressed in the currency decimals
         uint256 totalBorrowsVariable;
 
-        // 可变利率借款利率
+        // 当前可变利率借款利率
         //the current variable borrow rate. Expressed in ray
         uint256 currentVariableBorrowRate;
 
-        // 稳定利率借款利率
+        // 当前稳定利率借款利率
         //the current stable borrow rate. Expressed in ray
         uint256 currentStableBorrowRate;
 
@@ -62,7 +62,7 @@ library CoreLibrary {
         //the current average stable borrow rate (weighted average of all the different stable rate loans). Expressed in ray
         uint256 currentAverageStableBorrowRate;
 
-        // 可变利率累计指数
+        // 上次可变利率累计指数
         //variable borrow index. Expressed in ray
         uint256 lastVariableBorrowCumulativeIndex;
 
@@ -80,20 +80,33 @@ library CoreLibrary {
 
 
         //the decimals of the reserve asset
+        // 资产精度
         uint256 decimals;
+
         /**
         * @dev address of the aToken representing the asset
         **/
+        // a token 地址
         address aTokenAddress;
+
         /**
         * @dev address of the interest rate strategy contract
         **/
+        // 收益率策略合约的地址
         address interestRateStrategyAddress;
+
+        // 上次更新时间
         uint40 lastUpdateTimestamp;
+
+        // 借款开关
         // borrowingEnabled = true means users can borrow from this reserve
         bool borrowingEnabled;
+
+        // 做为抵押资产开关
         // usageAsCollateralEnabled = true means users can use this reserve as collateral
         bool usageAsCollateralEnabled;
+
+        // 是否可以用稳定利率借款开关
         // isStableBorrowRateEnabled = true means users can borrow at a stable rate
         bool isStableBorrowRateEnabled;
 
