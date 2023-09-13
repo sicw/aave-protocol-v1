@@ -207,6 +207,16 @@ describe("Aave v1", function () {
                 currentLiquidationThreshold,
                 userLtv,
                 healthFactor] = await lendingPoolDataProvider.getUserAccountData('0xC5EbBB67d0a19DF34899537A74FA67f8c2966f4E');
+            /*
+                totalLiquidityETH:0
+                totalCollateralETH:0
+                totalBorrowsETH:0
+                totalFeesETH:0
+                availableBorrowsETH:0
+                currentLiquidationThreshold:0
+                ltv:0
+                healthFactor:115792089237316195423570985008687907853269984665640564039457584007913129639935
+            * */
             console.log(`totalLiquidityETH:${totalLiquidityETH}`)
             console.log(`totalCollateralETH:${totalCollateralETH}`)
             console.log(`totalBorrowsETH:${totalBorrowsETH}`)
@@ -228,6 +238,18 @@ describe("Aave v1", function () {
                 userVariableBorrowIndex,
                 userLastUpdateTimestamp,
                 userUsageAsCollateralEnabled] = await lendingPoolDataProvider.getUserReserveData(daiAddress, '0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+            /*
+                currentATokenBalance:2500000035869690114215
+                currentBorrowBalance:1000000037581020852327
+                principalBorrowBalance:1000000000000000000000
+                borrowRateMode:2
+                borrowRate:33861572913303013691138106
+                liquidityRate:12927846256478499344798900
+                originationFee:2500000000000000000
+                variableBorrowIndex:1000000000000000000000000000
+                lastUpdateTimestamp:1578506041
+                usageAsCollateralEnabled:true
+            * */
             console.log(`currentATokenBalance:${currentATokenBalance}`)
             console.log(`currentBorrowBalance:${currentBorrowBalance}`)
             console.log(`principalBorrowBalance:${principalBorrowBalance}`)
