@@ -169,10 +169,10 @@ describe("Aave v1", function () {
                 = await lendingPoolDataProvider.getReserveData(daiAddress);
 
             /*
-                totalLiquidity:2619.274103475205556991
-                availableLiquidity:1619.274103475205556991
+                totalLiquidity:2619274103475205556991
+                availableLiquidity:1619274103475205556991
                 totalBorrowsStable:0
-                totalBorrowsVariable:1000.000000000000000000
+                totalBorrowsVariable:1000000000000000000000
                 liquidityRate:12927846256478499344798900
                 variableBorrowRate:33861572913303013691138106
                 stableBorrowRate:115357033322569643811641941
