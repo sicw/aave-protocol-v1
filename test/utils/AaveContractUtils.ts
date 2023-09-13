@@ -7,6 +7,10 @@ import LendingPoolCoreABI
     from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/lendingpool/LendingPoolCore.sol/LendingPoolCore.json";
 import LendingPoolDataProviderABI
     from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/lendingpool/LendingPoolDataProvider.sol/LendingPoolDataProvider.json";
+
+import ATokenABI
+    from "/Users/sicwen/Desktop/aave-protocol-v1/artifacts/contracts/tokenization/AToken.sol/AToken.json";
+
 import {AccountUtil} from "./AccountUtil";
 import {
     aaveDeployer2Address, aaveDeployer7Address,
@@ -41,5 +45,10 @@ export class AaveContractUtils {
     static async getLendingPoolDataProvider(address : string) {
         const signer = await AccountUtil.getImpersonateAccount(aaveDeployer2Address);
         return new hre.ethers.Contract(address, LendingPoolDataProviderABI.abi, signer);
+    }
+
+    static async getAToken(address : string) {
+        const signer = await AccountUtil.getImpersonateAccount(aaveDeployer2Address);
+        return new hre.ethers.Contract(address, ATokenABI.abi, signer);
     }
 }

@@ -94,7 +94,7 @@ describe("Aave v1", function () {
         });
     });
 
-    describe("get all data", function () {
+    describe.skip("get all data", function () {
 
         it("set new LendingPoolCore address", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
@@ -260,6 +260,72 @@ describe("Aave v1", function () {
             console.log(`variableBorrowIndex:${userVariableBorrowIndex}`)
             console.log(`lastUpdateTimestamp:${userLastUpdateTimestamp}`)
             console.log(`usageAsCollateralEnabled:${userUsageAsCollateralEnabled}`)
+        });
+    });
+
+    describe.skip("get block info", function () {
+        // 1578506072
+        // 2020年1月9日 01:54:32.000
+        it("9241423", async function () {
+            const block = await ethers.provider.getBlock(9241423);
+            console.log(block);
+        });
+    });
+
+    describe("change time", function () {
+        // 1578506072
+        // 2020年1月9日 01:54:32.000
+        it("test", async function () {
+            const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
+
+            // 更改时间戳
+            await time.setNextBlockTimestamp(1578506072 + 60 * 60 * 24);
+
+            const signer = await AccountUtil.getImpersonateAccount('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+
+            const lendingPool = await AaveContractUtils.getLendingPool();
+            await lendingPool.connect(signer).setUserUseReserveAsCollateral(daiAddress, true);
+
+            // 1578592472 1day
+            const block = await ethers.provider.getBlock(9241424);
+            console.log(block);
+        });
+    });
+
+    describe.skip("get user balance", function () {
+
+        it("test", async function () {
+            const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
+
+            // 本地创建CoreLibrary
+            const coreLibraryFactory = await ethers.getContractFactory("CoreLibrary");
+            const coreLibrary = await coreLibraryFactory.deploy();
+
+            // 创建新LendingPoolCore
+            const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore", {
+                libraries: {
+                    CoreLibrary: await coreLibrary.getAddress(),
+                },
+            });
+            const lendingPoolCoreNewImpl = await lendingPoolCoreFactory.deploy();
+
+            // 替换线上代理
+            await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
+            const newLendingPoolCoreImplAddress = await lendingPoolCoreNewImpl.getAddress();
+            await lendingPoolAddressesProvider.setLendingPoolCoreImpl(newLendingPoolCoreImplAddress);
+
+            // 获取新LendingPoolCore
+            const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();
+            const lendingPoolCoreNew = await AaveContractUtils.getLendingPoolCoreWithAddress(lendingPoolCoreAddressNew);
+
+            const getLendingPoolDataProviderAddress = await lendingPoolAddressesProvider.getLendingPoolDataProvider();
+            const lendingPoolDataProvider = await AaveContractUtils.getLendingPoolDataProvider(getLendingPoolDataProviderAddress);
+
+            const aToken = await AaveContractUtils.getAToken(aDAIAddress);
+            const balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+
+            const block = await ethers.provider.getBlock('lasted');
+            console.log(`block time: ${block} user balance:${balance}`)
         });
     });
 });
