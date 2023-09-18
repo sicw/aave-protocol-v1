@@ -268,13 +268,11 @@ describe("Aave v1", function () {
         // 2020年1月9日 01:54:32.000
         it("9241423", async function () {
             const block = await ethers.provider.getBlock(9241423);
-            console.log(block);
+            console.log(block?.timestamp);
         });
     });
 
     describe.skip("change time", function () {
-        // 1578506072
-        // 2020年1月9日 01:54:32.000
         it("test", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
 
@@ -287,8 +285,9 @@ describe("Aave v1", function () {
             await lendingPool.connect(signer).setUserUseReserveAsCollateral(daiAddress, true);
 
             // 1578592472 1day
+            // 2020年1月10日 1:54:32.000
             const block = await ethers.provider.getBlock(9241424);
-            console.log(block);
+            console.log(block?.timestamp);
         });
     });
 
@@ -324,10 +323,11 @@ describe("Aave v1", function () {
             const aToken = await AaveContractUtils.getAToken(aDAIAddress);
             let balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
 
-            let block = await ethers.provider.getBlock(9241423);
+            const block = await ethers.provider.getBlock(9241423);
             // time     :   1578506072
             // balance  :   2500.000035869690114215
-            console.log(`block time: ${block.timestamp} user balance:${balance}`)
+            let blockNumber = await ethers.provider.getBlockNumber();
+            console.log(`block number:${blockNumber} block time: ${block.timestamp} user balance:${balance}`)
 
             // 更改时间戳
             await time.setNextBlockTimestamp(1578506072 + 60 * 60 * 24);
@@ -335,11 +335,12 @@ describe("Aave v1", function () {
             const lendingPool = await AaveContractUtils.getLendingPool();
             await lendingPool.connect(signer).setUserUseReserveAsCollateral(daiAddress, true);
 
-            block = await ethers.provider.getBlock(9241424);
+            blockNumber = await ethers.provider.getBlockNumber();
+            const block2 = await ethers.provider.getBlock(blockNumber);
             balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
             // time     :   1578506072
-            // balance  :   2500.000035869690114215
-            console.log(`block time: ${block.timestamp} user balance:${balance}`)
+            // balance  :   2500.088578662464619259
+            console.log(`block number:${blockNumber} block time: ${block2.timestamp} user balance:${balance}`)
         });
     });
 });
