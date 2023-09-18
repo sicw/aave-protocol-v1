@@ -272,7 +272,7 @@ describe("Aave v1", function () {
         });
     });
 
-    describe("change time", function () {
+    describe.skip("change time", function () {
         // 1578506072
         // 2020年1月9日 01:54:32.000
         it("test", async function () {
@@ -292,7 +292,7 @@ describe("Aave v1", function () {
         });
     });
 
-    describe.skip("get user balance", function () {
+    describe("get user balance", function () {
 
         it("test", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
@@ -322,10 +322,24 @@ describe("Aave v1", function () {
             const lendingPoolDataProvider = await AaveContractUtils.getLendingPoolDataProvider(getLendingPoolDataProviderAddress);
 
             const aToken = await AaveContractUtils.getAToken(aDAIAddress);
-            const balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+            let balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
 
-            const block = await ethers.provider.getBlock('lasted');
-            console.log(`block time: ${block} user balance:${balance}`)
+            let block = await ethers.provider.getBlock(9241423);
+            // time     :   1578506072
+            // balance  :   2500.000035869690114215
+            console.log(`block time: ${block.timestamp} user balance:${balance}`)
+
+            // 更改时间戳
+            await time.setNextBlockTimestamp(1578506072 + 60 * 60 * 24);
+            const signer = await AccountUtil.getImpersonateAccount('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+            const lendingPool = await AaveContractUtils.getLendingPool();
+            await lendingPool.connect(signer).setUserUseReserveAsCollateral(daiAddress, true);
+
+            block = await ethers.provider.getBlock(9241424);
+            balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+            // time     :   1578506072
+            // balance  :   2500.000035869690114215
+            console.log(`block time: ${block.timestamp} user balance:${balance}`)
         });
     });
 });
