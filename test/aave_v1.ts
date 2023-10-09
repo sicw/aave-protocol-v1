@@ -320,6 +320,10 @@ describe("Aave v1", function () {
             const getLendingPoolDataProviderAddress = await lendingPoolAddressesProvider.getLendingPoolDataProvider();
             const lendingPoolDataProvider = await AaveContractUtils.getLendingPoolDataProvider(getLendingPoolDataProviderAddress);
 
+            const ci = await lendingPoolCoreNew.getReserveLiquidityCumulativeIndex(daiAddress);
+            // 1000000000000000000000000000 (1 ray)
+            console.log(`ci:${ci}`);
+
             const aToken = await AaveContractUtils.getAToken(aDAIAddress);
             let balance = await aToken.balanceOf('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
 
