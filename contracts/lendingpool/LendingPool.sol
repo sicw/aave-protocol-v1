@@ -436,6 +436,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
             vars.healthFactorBelowThreshold
         ) = dataProvider.calculateUserGlobalData(msg.sender);
 
+        // 用户得有抵押
         require(vars.userCollateralBalanceETH > 0, "The collateral balance is 0");
 
         require(

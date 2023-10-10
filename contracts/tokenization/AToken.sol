@@ -242,6 +242,7 @@ contract AToken is ERC20, ERC20Detailed {
         require(amountToRedeem <= currentBalance, "User cannot redeem more than the available balance");
 
         //check that the user is allowed to redeem the amount
+        // 取出后是否还满足超额抵押贷款的健康度
         require(isTransferAllowed(msg.sender, amountToRedeem), "Transfer cannot be allowed.");
 
         //if the user is redirecting his interest towards someone else,
