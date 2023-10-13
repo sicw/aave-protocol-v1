@@ -116,10 +116,10 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _amount,
         bool _isFirstDeposit
     ) external onlyLendingPool {
-        // 更新流动性指数 && 借贷指数
+
         reserves[_reserve].updateCumulativeIndexes();
 
-        // 更新流动性利率 && 借款(稳定、可变)利率
+
         updateReserveInterestRatesAndTimestampInternal(_reserve, _amount, 0);
 
         if (_isFirstDeposit) {

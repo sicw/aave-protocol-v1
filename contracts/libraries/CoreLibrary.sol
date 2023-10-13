@@ -153,7 +153,7 @@ library CoreLibrary {
 
         if (totalBorrows > 0) {
             //only cumulating if there is any income being produced
-            // 计算存款利率
+            //只有在有收入产生的情况下才会累积
             uint256 cumulatedLiquidityInterest = calculateLinearInterest(
                 _self.currentLiquidityRate,
                 _self.lastUpdateTimestamp
@@ -161,8 +161,6 @@ library CoreLibrary {
             _self.lastLiquidityCumulativeIndex = cumulatedLiquidityInterest.rayMul(
                 _self.lastLiquidityCumulativeIndex
             );
-
-            // 计算贷款利率
             uint256 cumulatedVariableBorrowInterest = calculateCompoundedInterest(
                 _self.currentVariableBorrowRate,
                 _self.lastUpdateTimestamp
