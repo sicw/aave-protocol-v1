@@ -122,16 +122,12 @@ contract AToken is ERC20, ERC20Detailed {
 
     address public underlyingAssetAddress;
 
-    // 用户借贷利息
     mapping (address => uint256) private userIndexes;
 
-    // 收益重定向的地址
     mapping (address => address) private interestRedirectionAddresses;
 
-    // 接收收益的本金是多少
     mapping (address => uint256) private redirectedBalances;
 
-    // 收益重定向的授权额度
     mapping (address => address) private interestRedirectionAllowances;
 
     LendingPoolAddressesProvider private addressesProvider;
@@ -456,6 +452,7 @@ contract AToken is ERC20, ERC20Detailed {
 
     /**
     * @dev accumulates the accrued interest of the user to the principal balance
+    *      将用户的应计利息累计到本金余额 (利息重新投入到本金中)
     * @param _user the address of the user for which the interest is being accumulated
     * @return the previous principal balance, the new principal balance, the balance increase
     * and the new user index
@@ -532,6 +529,7 @@ contract AToken is ERC20, ERC20Detailed {
 
     /**
     * @dev calculate the interest accrued by _user on a specific balance
+    *      计算_user在特定余额上产生的利息
     * @param _user the address of the user for which the interest is being accumulated
     * @param _balance the balance on which the interest is calculated
     * @return the interest rate accrued
