@@ -279,7 +279,6 @@ contract AToken is ERC20, ERC20Detailed {
     function mintOnDeposit(address _account, uint256 _amount) external onlyLendingPool {
 
         //cumulates the balance of the user
-        // mint累计收益(复利)
         (,
         ,
         uint256 balanceIncrease,

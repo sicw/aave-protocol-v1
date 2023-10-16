@@ -119,11 +119,12 @@ contract LendingPoolCore is VersionedInitializable {
 
         reserves[_reserve].updateCumulativeIndexes();
 
-
+        // 更新资产的流动性利率, 也要把当前要存入的也算在内, 不然利率算出来是高的
         updateReserveInterestRatesAndTimestampInternal(_reserve, _amount, 0);
 
         if (_isFirstDeposit) {
             //if this is the first deposit of the user, we configure the deposit as enabled to be used as collateral
+            //如果这是用户的第一次存款，我们将存款配置为启用作为抵押品
             setUserUseReserveAsCollateral(_reserve, _user, true);
         }
     }
