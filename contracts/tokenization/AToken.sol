@@ -462,7 +462,6 @@ contract AToken is ERC20, ERC20Detailed {
 
         uint256 previousPrincipalBalance = super.balanceOf(_user);
 
-        // 计算上次累计以来的应计利息 => 本金+利息 - 本金
         // calculate the accrued interest since the last accumulation
         uint256 balanceIncrease = balanceOf(_user).sub(previousPrincipalBalance);
 
