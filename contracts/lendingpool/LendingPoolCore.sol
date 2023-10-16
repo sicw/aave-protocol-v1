@@ -1738,8 +1738,6 @@ contract LendingPoolCore is VersionedInitializable {
         reserve.currentStableBorrowRate = newStableRate;
         reserve.currentVariableBorrowRate = newVariableRate;
 
-        console.log('reserve.currentStableBorrowRate',reserve.currentStableBorrowRate);
-
         //solium-disable-next-line
         reserve.lastUpdateTimestamp = uint40(block.timestamp);
 
