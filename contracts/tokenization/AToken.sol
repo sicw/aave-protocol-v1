@@ -359,7 +359,6 @@ contract AToken is ERC20, ERC20Detailed {
             //the redirected balance partecipate in the interest
             return calculateCumulatedBalanceInternal(
                 _user,
-                // _user地址的收益没有重定向, 计算利息需要本金 + 重定向余额
                 currentPrincipalBalance.add(redirectedBalance)
                 )
                 .sub(redirectedBalance);
@@ -461,18 +460,15 @@ contract AToken is ERC20, ERC20Detailed {
         internal
         returns(uint256, uint256, uint256, uint256) {
 
-        // 本金金额
         uint256 previousPrincipalBalance = super.balanceOf(_user);
 
         // 计算上次累计以来的应计利息 => 本金+利息 - 本金
         // calculate the accrued interest since the last accumulation
         uint256 balanceIncrease = balanceOf(_user).sub(previousPrincipalBalance);
 
-        // 铸造与累积数量相等的代币
         // mints an amount of tokens equivalent to the amount accumulated
         _mint(_user, balanceIncrease);
 
-        // 更新用户索引, 每次存储后利息还不一样?
         // updates the user index
         uint256 index = userIndexes[_user] = core.getReserveNormalizedIncome(underlyingAssetAddress);
         return (
