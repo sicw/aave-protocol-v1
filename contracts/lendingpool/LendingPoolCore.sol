@@ -1733,7 +1733,7 @@ contract LendingPoolCore is VersionedInitializable {
             reserve.currentAverageStableBorrowRate
         );
 
-        // 更新计算(存款/贷款)利率的参数
+        // 更新当前流动性利率(借款产生的利息 / 总存款)
         reserve.currentLiquidityRate = newLiquidityRate;
         reserve.currentStableBorrowRate = newStableRate;
         reserve.currentVariableBorrowRate = newVariableRate;
