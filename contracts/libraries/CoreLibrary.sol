@@ -155,9 +155,12 @@ library CoreLibrary {
             //only cumulating if there is any income being produced
             //只有在有收入产生的情况下才会累积
             uint256 cumulatedLiquidityInterest = calculateLinearInterest(
+                // 要使用上次流动性利率进行计算该段时间内产生的线性收益利率
                 _self.currentLiquidityRate,
                 _self.lastUpdateTimestamp
             );
+
+            // 将收益率进行累计，也就是流动性累计指数。指数再乘以本金得到的就是总额(本金+收益)
             _self.lastLiquidityCumulativeIndex = cumulatedLiquidityInterest.rayMul(
                 _self.lastLiquidityCumulativeIndex
             );
