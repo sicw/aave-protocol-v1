@@ -499,30 +499,25 @@ contract AToken is ERC20, ERC20Detailed {
         uint256 _balanceToRemove
     ) internal {
 
-        // A设置了重定向地址
         address redirectionAddress = interestRedirectionAddresses[_user];
         //if there isn't any redirection, nothing to be done
         if(redirectionAddress == address(0)){
             return;
         }
 
-        // 计算B的收益
         //compound balances of the redirected address
         (,,uint256 balanceIncrease, uint256 index) = cumulateBalanceInternal(redirectionAddress);
 
-        // 将重定向收益增加到B
         //updating the redirected balance
         redirectedBalances[redirectionAddress] = redirectedBalances[redirectionAddress]
             .add(_balanceToAdd)
             .sub(_balanceToRemove);
 
-        // 如果B也是重定向, 则获取到目标地址C
         //if the interest of redirectionAddress is also being redirected, we need to update
         //the redirected balance of the redirection target by adding the balance increase
         address targetOfRedirectionAddress = interestRedirectionAddresses[redirectionAddress];
 
         if(targetOfRedirectionAddress != address(0)){
-            // C地址的重定向余额
             redirectedBalances[targetOfRedirectionAddress] = redirectedBalances[targetOfRedirectionAddress].add(balanceIncrease);
         }
 
