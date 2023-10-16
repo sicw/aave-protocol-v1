@@ -469,6 +469,7 @@ contract AToken is ERC20, ERC20Detailed {
         _mint(_user, balanceIncrease);
 
         // updates the user index
+        // 在上面balanceOf(_user)中用到的userIndex就是这里的数据, 该user上次操作时记录的。
         uint256 index = userIndexes[_user] = core.getReserveNormalizedIncome(underlyingAssetAddress);
         return (
             previousPrincipalBalance,
@@ -535,6 +536,7 @@ contract AToken is ERC20, ERC20Detailed {
     ) internal view returns (uint256) {
         return _balance
             .wadToRay()
+            // 在计算getReserveNormalizedIncome时里面用到的currentLiquidityRate、lastUpdateTimestamp。已经在updateStateOnDeposit中更新完了啊。 验证下里面的时间间隔为0
             .rayMul(core.getReserveNormalizedIncome(underlyingAssetAddress))
             .rayDiv(userIndexes[_user])
             .rayToWad();
