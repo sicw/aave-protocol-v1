@@ -536,7 +536,8 @@ contract AToken is ERC20, ERC20Detailed {
     ) internal view returns (uint256) {
         return _balance
             .wadToRay()
-            // 在计算getReserveNormalizedIncome时里面用到的currentLiquidityRate、lastUpdateTimestamp。已经在updateStateOnDeposit中更新完了啊。 验证下里面的时间间隔为0
+            // 在计算getReserveNormalizedIncome时里面用到的currentLiquidityRate、lastUpdateTimestamp。已经在updateStateOnDeposit中更新完了
+            // 这里的时间间隔为0, 所以返回的是_reserve.lastLiquidityCumulativeIndex
             .rayMul(core.getReserveNormalizedIncome(underlyingAssetAddress))
             .rayDiv(userIndexes[_user])
             .rayToWad();
