@@ -802,6 +802,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     }
 
     /**
+    * 用户可以调用此函数来平仓抵押不足的头寸。
     * @dev users can invoke this function to liquidate an undercollateralized position.
     * @param _reserve the address of the collateral to liquidated
     * @param _reserve the address of the principal reserve
@@ -841,6 +842,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     }
 
     /**
+    * 允许智能合约在一笔交易中访问池的流动性，只要收回的金额加上费用。注意闪贷接收方合同的开发者必须考虑安全问题。欲知详情，请浏览https://developers.aave.com
     * @dev allows smartcontracts to access the liquidity of the pool within one transaction,
     * as long as the amount taken plus a fee is returned. NOTE There are security concerns for developers of flashloan receiver contracts
     * that must be kept into consideration. For further details please visit https://developers.aave.com
