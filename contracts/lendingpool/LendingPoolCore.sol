@@ -200,14 +200,17 @@ contract LendingPoolCore is VersionedInitializable {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
-        console.log('currentStableBorrowRate 1', reserve.currentStableBorrowRate);
-        console.log('stableBorrowRate 1', user.stableBorrowRate);
+        console.log('currentStableBorrowRate 0', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 0', user.stableBorrowRate);
 
         // getting the previous borrow data of the user
         (uint256 principalBorrowBalance, , uint256 balanceIncrease) = getUserBorrowBalances(
             _reserve,
             _user
         );
+
+        console.log('currentStableBorrowRate 1', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 1', user.stableBorrowRate);
 
         // 更新利率累计指数、总资产的借贷数量, 可切换不同借款模式
         updateReserveStateOnBorrowInternal(
