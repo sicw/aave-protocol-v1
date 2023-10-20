@@ -197,6 +197,8 @@ contract LendingPoolCore is VersionedInitializable {
         CoreLibrary.InterestRateMode _rateMode
     ) external onlyLendingPool returns (uint256, uint256) {
 
+        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
+        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         console.log('currentStableBorrowRate 1', reserve.currentStableBorrowRate);
         console.log('stableBorrowRate 1', user.stableBorrowRate);
@@ -206,9 +208,6 @@ contract LendingPoolCore is VersionedInitializable {
             _reserve,
             _user
         );
-
-        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
-        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
         // 更新利率累计指数、总资产的借贷数量, 可切换不同借款模式
         updateReserveStateOnBorrowInternal(
