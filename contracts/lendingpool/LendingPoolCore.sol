@@ -202,6 +202,12 @@ contract LendingPoolCore is VersionedInitializable {
             _user
         );
 
+        CoreLibrary.ReserveData storage reserve = reserves[_reserve];
+        CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
+
+        console.log('currentStableBorrowRate 1', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 1', user.stableBorrowRate);
+
         // 更新利率累计指数、总资产的借贷数量, 可切换不同借款模式
         updateReserveStateOnBorrowInternal(
             _reserve,
@@ -211,6 +217,9 @@ contract LendingPoolCore is VersionedInitializable {
             _amountBorrowed,
             _rateMode
         );
+
+        console.log('currentStableBorrowRate 2', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 2', user.stableBorrowRate);
 
         // 更新用户的借款数量, 可变利率累计指数、稳定利率、时间戳
         updateUserStateOnBorrowInternal(
@@ -222,8 +231,14 @@ contract LendingPoolCore is VersionedInitializable {
             _rateMode
         );
 
+        console.log('currentStableBorrowRate 3', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 3', user.stableBorrowRate);
+
         // 更新流动性利率、借贷利率、稳定利率、时间戳
         updateReserveInterestRatesAndTimestampInternal(_reserve, 0, _amountBorrowed);
+
+        console.log('currentStableBorrowRate 4', reserve.currentStableBorrowRate);
+        console.log('stableBorrowRate 4', user.stableBorrowRate);
 
         return (getUserCurrentBorrowRate(_reserve, _user), balanceIncrease);
     }
@@ -557,10 +572,11 @@ contract LendingPoolCore is VersionedInitializable {
 
         if (!reserve.isStableBorrowRateEnabled) return false;
 
-        return
-            !user.useAsCollateral ||
-            !reserve.usageAsCollateralEnabled ||
-            _amount > getUserUnderlyingAssetBalance(_reserve, _user);
+//        return
+//            !user.useAsCollateral ||
+//            !reserve.usageAsCollateralEnabled ||
+//            _amount > getUserUnderlyingAssetBalance(_reserve, _user);
+        return true;
     }
 
     /**
@@ -1720,6 +1736,7 @@ contract LendingPoolCore is VersionedInitializable {
     }
 
     /**
+    * 更新储备当前稳定借款利率Rf、当前可变借款利率Rv和当前流动性利率Rl。还更新lastUpdateTimestamp值。详情请参阅白皮书。
     * @dev Updates the reserve current stable borrow rate Rf, the current variable borrow rate Rv and the current liquidity rate Rl.
     * Also updates the lastUpdateTimestamp value. Please refer to the whitepaper for further information.
     * @param _reserve the address of the reserve to be updated

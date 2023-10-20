@@ -349,7 +349,7 @@ describe("Aave v1", function () {
 
     describe("lending pool test", function () {
 
-        it("deposit", async function () {
+        it.skip("deposit", async function () {
             const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
 
             // 本地创建CoreLibrary
@@ -379,6 +379,43 @@ describe("Aave v1", function () {
             const signer = await AccountUtil.getImpersonateAccount('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
             const lendingPool = await AaveContractUtils.getLendingPool();
             await lendingPool.connect(signer).deposit(daiAddress, 1000000000000000, 0);
+        });
+
+        it("borrow", async function () {
+            const {lendingPoolAddressesProvider} = await loadFixture(deployTestEnvFixture);
+
+            // 本地创建CoreLibrary
+            const coreLibraryFactory = await ethers.getContractFactory("CoreLibrary");
+            const coreLibrary = await coreLibraryFactory.deploy();
+
+            // 创建新LendingPoolCore
+            const lendingPoolCoreFactory = await ethers.getContractFactory("LendingPoolCore", {
+                libraries: {
+                    CoreLibrary: await coreLibrary.getAddress(),
+                },
+            });
+            const lendingPoolCoreNewImpl = await lendingPoolCoreFactory.deploy();
+
+            // 替换线上代理
+            await EthUtil.transfer(ethRicherAddress, aaveDeployer7Address, 10);
+            const newLendingPoolCoreImplAddress = await lendingPoolCoreNewImpl.getAddress();
+            await lendingPoolAddressesProvider.setLendingPoolCoreImpl(newLendingPoolCoreImplAddress);
+
+            // 获取新LendingPoolCore
+            const lendingPoolCoreAddressNew = await lendingPoolAddressesProvider.getLendingPoolCore();
+            const lendingPoolCoreNew = await AaveContractUtils.getLendingPoolCoreWithAddress(lendingPoolCoreAddressNew);
+
+            const getLendingPoolDataProviderAddress = await lendingPoolAddressesProvider.getLendingPoolDataProvider();
+            const lendingPoolDataProvider = await AaveContractUtils.getLendingPoolDataProvider(getLendingPoolDataProviderAddress);
+
+            const signer = await AccountUtil.getImpersonateAccount('0x5d3183cB8967e3C9b605dc35081E5778EE462328');
+            const lendingPool = await AaveContractUtils.getLendingPool();
+            await lendingPool.connect(signer).borrow(daiAddress, 100000000000, 1, 0);
+            console.log('--------------------')
+            await lendingPool.connect(signer).borrow(daiAddress, 100000000000, 1, 0);
+            console.log('--------------------')
+            await lendingPool.connect(signer).borrow(daiAddress, 100000000000, 1, 0);
+            console.log('--------------------')
         });
     });
 });

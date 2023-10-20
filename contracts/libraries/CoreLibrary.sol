@@ -139,7 +139,7 @@ library CoreLibrary {
             _reserve
             .lastUpdateTimestamp
         );
-        console.log('calculateLinearInterest:', cumulated0);
+        // console.log('calculateLinearInterest:', cumulated0);
 
         uint256 cumulated = calculateLinearInterest(
             _reserve
@@ -330,6 +330,7 @@ library CoreLibrary {
                     .lastUpdateTimestamp
             )
                 .rayMul(_reserve.lastVariableBorrowCumulativeIndex)
+                // 可变利率是累计的, 所以要除掉用户开始累计的指数
                 .rayDiv(_self.lastVariableBorrowCumulativeIndex);
         }
 
@@ -338,6 +339,7 @@ library CoreLibrary {
         if (compoundedBalance == _self.principalBorrowBalance) {
             //solium-disable-next-line
             if (_self.lastUpdateTimestamp != block.timestamp) {
+                // 没有利息累积，因为四舍五入-我们加1为象征性的累计利息，以避免无息贷款.
                 //no interest cumulation because of the rounding - we add 1 wei
                 //as symbolic cumulated interest to avoid interest free loans.
 
