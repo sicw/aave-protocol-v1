@@ -181,6 +181,7 @@ contract LendingPoolCore is VersionedInitializable {
 
     /**
     * @dev updates the state of the core as a consequence of a borrow action.
+    * 作为借用动作的结果，更新核心的状态。
     * @param _reserve the address of the reserve on which the user is borrowing
     * @param _user the address of the borrower
     * @param _amountBorrowed the new amount borrowed
@@ -195,13 +196,13 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _borrowFee,
         CoreLibrary.InterestRateMode _rateMode
     ) external onlyLendingPool returns (uint256, uint256) {
-        // 返回值是 (借款本金,,复息)
         // getting the previous borrow data of the user
         (uint256 principalBorrowBalance, , uint256 balanceIncrease) = getUserBorrowBalances(
             _reserve,
             _user
         );
 
+        // 更新利率累计指数、总资产的借贷数量, 可切换不同借款模式
         updateReserveStateOnBorrowInternal(
             _reserve,
             _user,
@@ -211,6 +212,7 @@ contract LendingPoolCore is VersionedInitializable {
             _rateMode
         );
 
+        // 更新用户的借款数量, 可变利率累计指数、稳定利率、时间戳
         updateUserStateOnBorrowInternal(
             _reserve,
             _user,
@@ -220,6 +222,7 @@ contract LendingPoolCore is VersionedInitializable {
             _rateMode
         );
 
+        // 更新流动性利率、借贷利率、稳定利率、时间戳
         updateReserveInterestRatesAndTimestampInternal(_reserve, 0, _amountBorrowed);
 
         return (getUserCurrentBorrowRate(_reserve, _user), balanceIncrease);
@@ -507,6 +510,7 @@ contract LendingPoolCore is VersionedInitializable {
     **/
 
     /**
+    * 返回在LendingPoolDataProvider中计算全局帐户数据所需的基本数据(余额、应计费用、启用/禁用作为抵押品的准备金)
     * @dev returns the basic data (balances, fee accrued, reserve enabled/disabled as collateral)
     * needed to calculate the global account data in the LendingPoolDataProvider
     * @param _reserve the address of the reserve
@@ -1284,8 +1288,13 @@ contract LendingPoolCore is VersionedInitializable {
     * @dev updates the state of a reserve as a consequence of a borrow action.
     * @param _reserve the address of the reserve on which the user is borrowing
     * @param _user the address of the borrower
+    *
+    * 上次借款时的本金余额
     * @param _principalBorrowBalance the previous borrow balance of the borrower before the action
+
+    * 从上次借款到现在增长的利息
     * @param _balanceIncrease the accrued interest of the user on the previous borrowed amount
+    *
     * @param _amountBorrowed the new amount borrowed
     * @param _rateMode the borrow rate mode (stable, variable)
     **/
@@ -1298,10 +1307,14 @@ contract LendingPoolCore is VersionedInitializable {
         uint256 _amountBorrowed,
         CoreLibrary.InterestRateMode _rateMode
     ) internal {
+
+        // 更新利率累计指数
         reserves[_reserve].updateCumulativeIndexes();
 
         //increasing reserve total borrows to account for the new borrow balance of the user
+        //增加储备金借款总额以计入用户的新借款余额
         //NOTE: Depending on the previous borrow mode, the borrows might need to be switched from variable to stable or vice versa
+        //注意:根据之前的借用模式，借用可能需要从可变模式切换到稳定模式，反之亦然
 
         updateReserveTotalBorrowsByRateModeInternal(
             _reserve,
@@ -1334,8 +1347,6 @@ contract LendingPoolCore is VersionedInitializable {
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
         CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
 
-        console.log('_rateMode == CoreLibrary.InterestRateMode.STABLE', _rateMode == CoreLibrary.InterestRateMode.STABLE);
-        console.log('reserve.currentStableBorrowRate', reserve.currentStableBorrowRate);
         if (_rateMode == CoreLibrary.InterestRateMode.STABLE) {
             //stable
             //reset the user variable index, and update the stable rate
@@ -1683,6 +1694,7 @@ contract LendingPoolCore is VersionedInitializable {
         );
         CoreLibrary.ReserveData storage reserve = reserves[_reserve];
 
+        // 先减去旧借款模式的存储
         if (previousRateMode == CoreLibrary.InterestRateMode.STABLE) {
             CoreLibrary.UserReserveData storage user = usersReserveData[_user][_reserve];
             reserve.decreaseTotalBorrowsStableAndUpdateAverageRate(
@@ -1693,7 +1705,7 @@ contract LendingPoolCore is VersionedInitializable {
             reserve.decreaseTotalBorrowsVariable(_principalBalance);
         }
 
-        // 复息计算, 把借款产生的利息也算在内
+        // 再新增新借款模式的存储
         uint256 newPrincipalAmount = _principalBalance.add(_balanceIncrease).add(_amountBorrowed);
         if (_newBorrowRateMode == CoreLibrary.InterestRateMode.STABLE) {
             reserve.increaseTotalBorrowsStableAndUpdateAverageRate(

@@ -384,6 +384,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     /**
     * @dev Allows users to borrow a specific amount of the reserve currency, provided that the borrower
     * already deposited enough collateral.
+    * 允许用户借入一定数量的储备货币，前提是借款人已经存入足够的抵押品
     * @param _reserve the address of the reserve
     * @param _amount the amount to be borrowed
     * @param _interestRateMode the interest rate mode at which the user wants to borrow. Can be 0 (STABLE) or 1 (VARIABLE)
@@ -706,6 +707,7 @@ contract LendingPool is ReentrancyGuard, VersionedInitializable {
     }
 
     /**
+    * 如果当前流动性利率，则重新平衡用户的稳定利率;用户稳定率。这是由Aave监管的，以确保协议不被滥用，并且用户支付的是公平的费率。任何人都可以调用这个函数。
     * @dev rebalances the stable interest rate of a user if current liquidity rate > user stable rate.
     * this is regulated by Aave to ensure that the protocol is not abused, and the user is paying a fair
     * rate. Anyone can call this function though.

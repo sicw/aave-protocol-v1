@@ -3,6 +3,8 @@ pragma solidity ^0.5.0;
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./WadRayMath.sol";
 
+import "hardhat/console.sol";
+
 /**
 * @title CoreLibrary library
 * @author Aave
@@ -58,7 +60,7 @@ library CoreLibrary {
         //the current stable borrow rate. Expressed in ray
         uint256 currentStableBorrowRate;
 
-        // 平均借款利率(不同利率权重和)
+        // 稳定利率平均借款利率(不同利率权重和)
         //the current average stable borrow rate (weighted average of all the different stable rate loans). Expressed in ray
         uint256 currentAverageStableBorrowRate;
 
@@ -131,6 +133,14 @@ library CoreLibrary {
         view
         returns (uint256)
     {
+        uint256 cumulated0 = calculateLinearInterest(
+            _reserve
+            .currentLiquidityRate,
+            _reserve
+            .lastUpdateTimestamp
+        );
+        console.log('calculateLinearInterest:', cumulated0);
+
         uint256 cumulated = calculateLinearInterest(
             _reserve
                 .currentLiquidityRate,
@@ -159,11 +169,12 @@ library CoreLibrary {
                 _self.currentLiquidityRate,
                 _self.lastUpdateTimestamp
             );
-
             // 将收益率进行累计，也就是流动性累计指数。指数再乘以本金得到的就是总额(本金+收益)
             _self.lastLiquidityCumulativeIndex = cumulatedLiquidityInterest.rayMul(
                 _self.lastLiquidityCumulativeIndex
             );
+
+            // 累计可变利率贷款的指数
             uint256 cumulatedVariableBorrowInterest = calculateCompoundedInterest(
                 _self.currentVariableBorrowRate,
                 _self.lastUpdateTimestamp
@@ -305,12 +316,14 @@ library CoreLibrary {
 
         if (_self.stableBorrowRate > 0) {
             cumulatedInterest = calculateCompoundedInterest(
+                // 用户当时贷款利率
                 _self.stableBorrowRate,
                 _self.lastUpdateTimestamp
             );
         } else {
             //variable interest
             cumulatedInterest = calculateCompoundedInterest(
+                // 资金池当前利率
                 _reserve
                     .currentVariableBorrowRate,
                 _reserve
@@ -364,6 +377,7 @@ library CoreLibrary {
     }
 
     /**
+    * 以稳定利率减少特定准备金的总借款，并因此更新平均稳定利率
     * @dev decreases the total borrows at a stable rate on a specific reserve and updates the
     * average stable rate consequently
     * @param _reserve the reserve object
